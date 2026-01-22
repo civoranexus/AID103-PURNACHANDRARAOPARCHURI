@@ -1,11 +1,5 @@
-Django==4.2.8
-djangorestframework==3.14.0
-django-cors-headers==4.3.1
-python-decouple==3.8
-Pillow==10.1.0
-numpy==1.24.3
-opencv-python==4.8.1.78
-requests==2.31.0
-gunicorn==21.2.0
-psycopg2-binary==2.9.9
-python-dateutil==2.8.2
+flask
+tensorflow
+opencv-python
+numpy
+pillow

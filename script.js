@@ -114,6 +114,8 @@ const elements = {
     latValue: document.getElementById('latValue'),
     lonValue: document.getElementById('lonValue'),
     areaName: document.getElementById('areaName'),
+    accuracyValue: document.getElementById('accuracyValue'),
+    fetchLocation: document.getElementById('fetchLocation'),
     confirmLocation: document.getElementById('confirmLocation'),
 
     // Image input
@@ -682,11 +684,184 @@ function generateAlerts(severity, location, cropType) {
 }
 
 // ============================================
+// GEOLOCATION MODULE - FETCH USER LOCATION
+// ============================================
+function fetchUserLocation() {
+    if (!navigator.geolocation) {
+        showAlert('Geolocation is not supported by your browser', 'error');
+        return;
+    }
+
+    const fetchBtn = elements.fetchLocation;
+    const originalText = fetchBtn.textContent;
+    fetchBtn.textContent = '📍 Fetching Location...';
+    fetchBtn.disabled = true;
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude, accuracy } = position.coords;
+            
+            // Update state
+            state.location.latitude = latitude;
+            state.location.longitude = longitude;
+
+            // Update UI
+            elements.latValue.textContent = latitude.toFixed(6);
+            elements.lonValue.textContent = longitude.toFixed(6);
+            elements.accuracyValue.textContent = `±${accuracy.toFixed(2)} meters`;
+
+            // Determine region and area
+            const areaName = determineAreaFromCoordinates(latitude, longitude);
+            state.location.areaName = areaName;
+            elements.areaName.textContent = areaName;
+
+            // Enable confirm button
+            elements.confirmLocation.disabled = false;
+
+            // Show success alert
+            showAlert(`Location fetched successfully! (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`, 'success');
+
+            // Reset button
+            fetchBtn.textContent = originalText;
+            fetchBtn.disabled = false;
+        },
+        (error) => {
+            let errorMsg = 'Unable to fetch location. ';
+            
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMsg += 'Permission denied. Please enable location access in your browser settings.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMsg += 'Position information is unavailable.';
+                    break;
+                case error.TIMEOUT:
+                    errorMsg += 'Location request timed out. Please try again.';
+                    break;
+                default:
+                    errorMsg += error.message;
+            }
+            
+            showAlert(errorMsg, 'error');
+            
+            // Reset button
+            fetchBtn.textContent = originalText;
+            fetchBtn.disabled = false;
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+
+// Determine geographic area/region from coordinates
+function determineAreaFromCoordinates(latitude, longitude) {
+    // Indian geographic regions mapping
+    const regions = {
+        // North India (Punjab, Haryana, HP, Uttarakhand, J&K)
+        north: {
+            minLat: 28.5, maxLat: 37.5,
+            minLon: 74, maxLon: 78.5,
+            areas: ['Punjab', 'Haryana', 'Himachal Pradesh', 'Uttarakhand', 'Jammu & Kashmir']
+        },
+        // South India (Karnataka, TN, Telangana, AP)
+        south: {
+            minLat: 8, maxLat: 16,
+            minLon: 74, maxLon: 82,
+            areas: ['Karnataka', 'Tamil Nadu', 'Telangana', 'Andhra Pradesh']
+        },
+        // East India (Bihar, Jharkhand, Odisha, WB, Assam)
+        east: {
+            minLat: 19, maxLat: 28,
+            minLon: 83, maxLon: 91,
+            areas: ['Bihar', 'Jharkhand', 'Odisha', 'West Bengal', 'Assam']
+        },
+        // West India (Gujarat, Maharashtra, Rajasthan)
+        west: {
+            minLat: 16, maxLat: 28,
+            minLon: 68, maxLon: 76,
+            areas: ['Gujarat', 'Maharashtra', 'Rajasthan']
+        },
+        // Central India (MP, Chhattisgarh, UP)
+        central: {
+            minLat: 20, maxLat: 27,
+            minLon: 76, maxLon: 85,
+            areas: ['Madhya Pradesh', 'Chhattisgarh', 'Uttar Pradesh']
+        }
+    };
+
+    // Find which region the coordinates fall into
+    for (const [region, bounds] of Object.entries(regions)) {
+        if (latitude >= bounds.minLat && latitude <= bounds.maxLat &&
+            longitude >= bounds.minLon && longitude <= bounds.maxLon) {
+            
+            // Return a random area from that region's list
+            const areaList = bounds.areas;
+            return areaList[Math.floor(Math.random() * areaList.length)];
+        }
+    }
+
+    // Default fallback
+    return 'Central India (Default)';
+}
+
+// Show temporary alert notification
+function showAlert(message, type = 'info') {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type}`;
+    
+    const iconMap = {
+        'success': '✓',
+        'error': '✕',
+        'warning': '⚠',
+        'info': 'ℹ'
+    };
+    
+    alertDiv.innerHTML = `
+        <span class="alert-icon">${iconMap[type] || 'ℹ'}</span>
+        <span class="alert-message">${message}</span>
+    `;
+    
+    // Add styles for temp alert
+    alertDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#FF8C00' : '#3B82F6'};
+        color: white;
+        border-radius: 6px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 500;
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto-remove after 4 seconds
+    setTimeout(() => {
+        alertDiv.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => alertDiv.remove(), 300);
+    }, 4000);
+}
+
+// ============================================
 // INITIALIZATION & EVENT LISTENERS
 // ============================================
 function init() {
     // Initialize map
     const mapModule = new MapModule(elements.mapCanvas);
+
+    // Fetch current location button
+    elements.fetchLocation.addEventListener('click', () => {
+        fetchUserLocation();
+    });
 
     // Confirm location button
     elements.confirmLocation.addEventListener('click', () => {
