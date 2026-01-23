@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pest Management - CropGuard AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        .card-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; }
+        .pest-item {
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .pest-name { font-weight: 600; color: #333; }
+        .pest-info { font-size: 12px; color: #666; margin: 5px 0; }
+        .level-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .level-high { background: #ff6b6b; color: white; }
+        .level-medium { background: #ffd700; color: #333; }
+        .level-low { background: #51cf66; color: white; }
+        .pest-calendar { width: 100%; }
+        .calendar-day {
+            display: inline-block;
+            width: 12%;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 11px;
+            background: #f0f0f0;
+            margin: 2px;
+        }
+        .calendar-day.active { background: #667eea; color: white; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover { background: #5568d3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐛 Pest Management System</h1>
+            <p>Monitor and control pest infestations on your crops</p>
+        </div>
+
+        <div class="grid">
+            <!-- Active Pests -->
+            <div class="card">
+                <div class="card-title">🐛 Active Pests</div>
+                <div class="pest-item">
+                    <div class="pest-name">Bollworm</div>
+                    <div class="pest-info">Cotton field - Detected 3 days ago</div>
+                    <div><span class="level-indicator level-high">HIGH</span></div>
+                </div>
+                <div class="pest-item">
+                    <div class="pest-name">Leaf Hopper</div>
+                    <div class="pest-info">Sugarcane area - Low activity</div>
+                    <div><span class="level-indicator level-low">LOW</span></div>
+                </div>
+                <div class="pest-item">
+                    <div class="pest-name">Mites</div>
+                    <div class="pest-info">Vegetable garden - Moderate</div>
+                    <div><span class="level-indicator level-medium">MEDIUM</span></div>
+                </div>
+            </div>
+
+            <!-- Treatment Records -->
+            <div class="card">
+                <div class="card-title">💊 Treatment Records</div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="padding: 10px; background: #f8f9ff; border-radius: 6px;">
+                        <strong style="color: #333; font-size: 13px;">Neem Oil Spray</strong>
+                        <p style="font-size: 11px; color: #666; margin: 3px 0;">Applied on Cotton - 2 days ago</p>
+                    </div>
+                    <div style="padding: 10px; background: #f8f9ff; border-radius: 6px;">
+                        <strong style="color: #333; font-size: 13px;">Insecticide Application</strong>
+                        <p style="font-size: 11px; color: #666; margin: 3px 0;">Applied on Sugarcane - 1 week ago</p>
+                    </div>
+                    <div style="padding: 10px; background: #f8f9ff; border-radius: 6px;">
+                        <strong style="color: #333; font-size: 13px;">Pheromone Trap</strong>
+                        <p style="font-size: 11px; color: #666; margin: 3px 0;">Set up in vegetables - Active</p>
+                    </div>
+                </div>
+                <button>➕ Add Treatment</button>
+            </div>
+
+            <!-- Pest Calendar -->
+            <div class="card">
+                <div class="card-title">📅 Pest Activity Calendar</div>
+                <div style="font-size: 11px; color: #666; margin-bottom: 10px;">Days with detected activity</div>
+                <div class="pest-calendar">
+                    <div class="calendar-day">1</div>
+                    <div class="calendar-day active">2</div>
+                    <div class="calendar-day">3</div>
+                    <div class="calendar-day">4</div>
+                    <div class="calendar-day">5</div>
+                    <div class="calendar-day">6</div>
+                    <div class="calendar-day">7</div>
+                    <div class="calendar-day">8</div>
+                    <div class="calendar-day active">9</div>
+                    <div class="calendar-day">10</div>
+                </div>
+            </div>
+
+            <!-- Control Methods -->
+            <div class="card">
+                <div class="card-title">🛡️ Control Methods</div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="padding: 10px; background: #f8f9ff; border-radius: 6px;">
+                        <strong>Organic Methods</strong>
+                        <p style="font-size: 12px; color: #666; margin: 5px 0;">Neem oil, insecticidal soap, predatory insects</p>
+                    </div>
+                    <div style="padding: 10px; background: #f8f9ff; border-radius: 6px;">
+                        <strong>Chemical Methods</strong>
+                        <p style="font-size: 12px; color: #666; margin: 5px 0;">Synthetic pesticides, follow safety guidelines</p>
+                    </div>
+                    <div style="padding: 10px; background: #f8f9ff; border-radius: 6px;">
+                        <strong>Cultural Methods</strong>
+                        <p style="font-size: 12px; color: #666; margin: 5px 0;">Crop rotation, field sanitation, resistant varieties</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pest Monitoring Tips -->
+            <div class="card">
+                <div class="card-title">📋 Monitoring Tips</div>
+                <ul style="font-size: 13px; line-height: 1.8;">
+                    <li>✅ Check plants weekly for pest signs</li>
+                    <li>✅ Monitor leaf undersides for eggs/larvae</li>
+                    <li>✅ Use pheromone traps for early detection</li>
+                    <li>✅ Record pest activity daily</li>
+                    <li>✅ Maintain field cleanliness</li>
+                </ul>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="card">
+                <div class="card-title">💡 AI Recommendations</div>
+                <div style="padding: 15px; background: #f0f4ff; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <strong style="color: #333;">Immediate Action Required</strong>
+                    <p style="font-size: 13px; color: #666; margin-top: 5px;">High bollworm infestation in cotton field. Apply Bt spray or neem oil within 48 hours.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

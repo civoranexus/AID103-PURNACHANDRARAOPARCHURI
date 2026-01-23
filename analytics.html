@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - CropGuard AI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            font-size: 2.5em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-header {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-header:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Top Stats */
+        .top-stats {
+            background: white;
+            padding: 25px 30px;
+            border-bottom: 2px solid #e9ecef;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        .stat-change {
+            font-size: 0.85em;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 20px 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            border-bottom: 2px solid #e9ecef;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            padding: 30px;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Chart Card */
+        .chart-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .chart-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+        }
+
+        .chart-title {
+            font-size: 1.2em;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .chart-icon {
+            font-size: 1.5em;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 15px;
+        }
+
+        .chart-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-label {
+            color: #999;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Table */
+        .table-card {
+            grid-column: 1 / -1;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table thead {
+            background: white;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            color: #666;
+        }
+
+        table tbody tr:hover {
+            background: white;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Export Button */
+        .export-section {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .export-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .export-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-card {
+                grid-column: 1;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filters {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <span class="header-icon">📊</span>
+                Advanced Analytics
+            </h1>
+            <div class="header-actions">
+                <button class="btn-header" onclick="refreshData()">🔄 Refresh</button>
+                <button class="btn-header" onclick="goBack()">← Back</button>
+            </div>
+        </div>
+
+        <!-- Top Stats -->
+        <div class="top-stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Farms</div>
+                <div class="stat-value">3</div>
+                <div class="stat-change">↑ Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Farm Health</div>
+                <div class="stat-value">86.7%</div>
+                <div class="stat-change">↑ 2.1% vs last month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Crop Yield (2024)</div>
+                <div class="stat-value">116.5T</div>
+                <div class="stat-change">↑ 8.2% vs 2023</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Alerts</div>
+                <div class="stat-value">3</div>
+                <div class="stat-change">🔴 Requires attention</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>Farm:</label>
+                <select onchange="updateCharts()">
+                    <option>All Farms</option>
+                    <option>North Field Farm</option>
+                    <option>South Orchard</option>
+                    <option>East Vineyard</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Period:</label>
+                <select onchange="updateCharts()">
+                    <option>Last 30 Days</option>
+                    <option>Last 90 Days</option>
+                    <option>Last Year</option>
+                    <option>Custom Range</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Metric:</label>
+                <select onchange="updateCharts()">
+                    <option>All Metrics</option>
+                    <option>Health Score</option>
+                    <option>Yield</option>
+                    <option>Disease Impact</option>
+                </select>
+            </div>
+            <div class="filter-group" style="margin-left: auto;">
+                <button class="export-btn" style="margin: 0;" onclick="exportAnalytics()">📥 Export</button>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <!-- Farm Health Trend -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span class="chart-icon">❤️</span>
+                    <span>Farm Health Trend</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="healthChart"></canvas>
+                </div>
+                <div class="chart-info">
+                    Overall farm health is improving with consistent monitoring. North Field leads at 87%, South Orchard at 82%.
+                </div>
+            </div>
+
+            <!-- Crop Yield Analysis -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span class="chart-icon">🌾</span>
+                    <span>Crop Yield by Farm</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="yieldChart"></canvas>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-label">Wheat</div>
+                        <div class="metric-value">42T</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Rice</div>
+                        <div class="metric-value">38T</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Cotton</div>
+                        <div class="metric-value">8.5T</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Maize</div>
+                        <div class="metric-value">28T</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disease Impact -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span class="chart-icon">🦠</span>
+                    <span>Disease Impact Distribution</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="diseaseChart"></canvas>
+                </div>
+                <div class="chart-info">
+                    Disease incidents remain controlled with average 2.7% crop loss. Early detection has prevented major outbreaks.
+                </div>
+            </div>
+
+            <!-- Weather Impact -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span class="chart-icon">🌦️</span>
+                    <span>Monthly Rainfall vs Target</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="weatherChart"></canvas>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-label">Total Rain</div>
+                        <div class="metric-value">1,250mm</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Target</div>
+                        <div class="metric-value">1,200mm</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Deviation</div>
+                        <div class="metric-value">+50mm</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pest Management -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span class="chart-icon">🐛</span>
+                    <span>Pest Incidents Trend</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="pestChart"></canvas>
+                </div>
+                <div class="chart-info">
+                    Pest management effectiveness improving. Implementation of integrated pest management showing results with 15% fewer incidents.
+                </div>
+            </div>
+
+            <!-- Irrigation Efficiency -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span class="chart-icon">💧</span>
+                    <span>Water Usage Efficiency</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="waterChart"></canvas>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-label">Applied</div>
+                        <div class="metric-value">850mm</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Used</div>
+                        <div class="metric-value">720mm</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Efficiency</div>
+                        <div class="metric-value">84.7%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Table -->
+            <div class="chart-card table-card">
+                <div class="chart-title">
+                    <span class="chart-icon">📋</span>
+                    <span>Detailed Performance Metrics</span>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Farm Name</th>
+                                <th>Health Score</th>
+                                <th>Yield (2024)</th>
+                                <th>Disease Risk</th>
+                                <th>Pest Status</th>
+                                <th>Water Efficiency</th>
+                                <th>Overall Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>North Field Farm</td>
+                                <td>87%</td>
+                                <td>42 tons</td>
+                                <td><span class="badge badge-success">Low</span></td>
+                                <td><span class="badge badge-warning">Medium</span></td>
+                                <td>89%</td>
+                                <td><span class="badge badge-success">Good</span></td>
+                            </tr>
+                            <tr>
+                                <td>South Orchard</td>
+                                <td>82%</td>
+                                <td>38 tons</td>
+                                <td><span class="badge badge-warning">Medium</span></td>
+                                <td><span class="badge badge-danger">High</span></td>
+                                <td>81%</td>
+                                <td><span class="badge badge-warning">Fair</span></td>
+                            </tr>
+                            <tr>
+                                <td>East Vineyard</td>
+                                <td>91%</td>
+                                <td>36.5 tons</td>
+                                <td><span class="badge badge-success">Low</span></td>
+                                <td><span class="badge badge-success">Low</span></td>
+                                <td>83%</td>
+                                <td><span class="badge badge-success">Excellent</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Export Section -->
+            <div class="export-section">
+                <h3>📊 Export Analytics Report</h3>
+                <p style="margin-top: 10px; color: #666; margin-bottom: 15px;">
+                    Download comprehensive analytics report in your preferred format
+                </p>
+                <button class="export-btn" onclick="exportPDF()">📄 PDF Report</button>
+                <button class="export-btn" onclick="exportCSV()">📑 CSV Data</button>
+                <button class="export-btn" onclick="exportExcel()">📊 Excel Sheet</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize charts
+        function initializeCharts() {
+            // Farm Health Trend
+            const healthCtx = document.getElementById('healthChart').getContext('2d');
+            new Chart(healthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'North Field',
+                        data: [75, 76, 78, 80, 82, 84, 85, 86, 86, 87, 87, 87],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#667eea'
+                    }, {
+                        label: 'South Orchard',
+                        data: [70, 71, 72, 73, 75, 77, 79, 80, 81, 82, 82, 82],
+                        borderColor: '#764ba2',
+                        backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#764ba2'
+                    }, {
+                        label: 'East Vineyard',
+                        data: [85, 86, 87, 88, 89, 89, 90, 90, 91, 91, 91, 91],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { beginAtZero: true, max: 100 } }
+                }
+            });
+
+            // Crop Yield
+            const yieldCtx = document.getElementById('yieldChart').getContext('2d');
+            new Chart(yieldCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Wheat', 'Rice', 'Cotton', 'Maize'],
+                    datasets: [{
+                        label: '2024 Yield (tons)',
+                        data: [42, 38, 8.5, 28],
+                        backgroundColor: ['#667eea', '#764ba2', '#f59e0b', '#10b981'],
+                    }, {
+                        label: '2023 Yield (tons)',
+                        data: [37.4, 35.1, 9, 24.3],
+                        backgroundColor: 'rgba(200, 200, 200, 0.5)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Disease Distribution
+            const diseaseCtx = document.getElementById('diseaseChart').getContext('2d');
+            new Chart(diseaseCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Powdery Mildew', 'Early Blight', 'Leaf Rust', 'No Disease'],
+                    datasets: [{
+                        data: [15, 25, 10, 50],
+                        backgroundColor: ['#f59e0b', '#ef4444', '#f97316', '#10b981'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Weather/Rainfall
+            const weatherCtx = document.getElementById('weatherChart').getContext('2d');
+            new Chart(weatherCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Actual Rainfall (mm)',
+                        data: [50, 40, 30, 45, 120, 150, 200, 180, 160, 100, 60, 45],
+                        backgroundColor: '#3b82f6',
+                    }, {
+                        label: 'Target (mm)',
+                        data: [60, 50, 40, 50, 100, 130, 180, 160, 140, 90, 70, 55],
+                        borderColor: '#ef4444',
+                        borderWidth: 2,
+                        type: 'line',
+                        fill: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Pest Trend
+            const pestCtx = document.getElementById('pestChart').getContext('2d');
+            new Chart(pestCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
+                    datasets: [{
+                        label: 'Pest Incidents',
+                        data: [12, 11, 10, 9, 8, 7, 6, 5],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#ef4444'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Water Efficiency
+            const waterCtx = document.getElementById('waterChart').getContext('2d');
+            new Chart(waterCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Efficiency %',
+                        data: [80, 82, 83, 84, 85, 84.7],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        pointBackgroundColor: '#667eea'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        // Initialize on load
+        window.addEventListener('load', initializeCharts);
+
+        function updateCharts() {
+            console.log('Updating charts with new filters...');
+            // Reinitialize charts with new data
+        }
+
+        function exportAnalytics() {
+            alert('Generating analytics export...');
+        }
+
+        function exportPDF() {
+            alert('Downloading PDF report...');
+        }
+
+        function exportCSV() {
+            alert('Downloading CSV data...');
+        }
+
+        function exportExcel() {
+            alert('Downloading Excel file...');
+        }
+
+        function refreshData() {
+            alert('Refreshing data...');
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

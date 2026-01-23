@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Support - CropGuard AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-box button {
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .search-box button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        /* Content */
+        .content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 600px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #f8f9fa;
+            border-right: 2px solid #e9ecef;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            color: #666;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-link:hover {
+            background: #e9ecef;
+            color: #667eea;
+        }
+
+        .sidebar-link.active {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Main Area */
+        .main-area {
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-icon {
+            font-size: 2.5em;
+        }
+
+        .section-description {
+            color: #666;
+            font-size: 1em;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        /* Tutorial Cards */
+        .tutorial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .tutorial-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tutorial-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .tutorial-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .tutorial-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .tutorial-desc {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        /* FAQ */
+        .faq-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #1f2937;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: white;
+        }
+
+        .faq-toggle {
+            font-size: 1.3em;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.open .faq-toggle {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 15px 15px 15px;
+            color: #666;
+            line-height: 1.6;
+            display: none;
+            background: white;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .faq-item.open .faq-answer {
+            display: block;
+        }
+
+        /* Video Tutorial */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            background: #000;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .video-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .video-item:hover {
+            border-color: #667eea;
+        }
+
+        .video-thumb {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+        }
+
+        .video-info {
+            padding: 12px;
+        }
+
+        .video-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .video-duration {
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        /* Tips & Tricks */
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .tip-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .tip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .tip-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            opacity: 0.3;
+            margin-bottom: 10px;
+        }
+
+        .tip-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .tip-desc {
+            font-size: 0.95em;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        /* Getting Started */
+        .steps {
+            display: grid;
+            gap: 20px;
+        }
+
+        .step {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .step-number {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .step-content h3 {
+            font-size: 1.2em;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .step-content p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-right: none;
+                border-bottom: 2px solid #e9ecef;
+                display: flex;
+                overflow-x: auto;
+                padding: 10px;
+            }
+
+            .sidebar-section {
+                margin-right: 20px;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .tutorial-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .step {
+                grid-template-columns: 80px 1fr;
+            }
+
+            .step-number {
+                width: 80px;
+                height: 80px;
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>❓ Help & Support Center</h1>
+            <p>Everything you need to master CropGuard AI</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Search help articles, tutorials, FAQs..."
+                    onkeyup="searchHelp(this.value)"
+                >
+                <button onclick="performSearch()">🔍 Search</button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Getting Started</div>
+                    <a class="sidebar-link active" onclick="switchSection('getting-started')">📌 Getting Started</a>
+                    <a class="sidebar-link" onclick="switchSection('basics')">🎯 Basics</a>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Features</div>
+                    <a class="sidebar-link" onclick="switchSection('photo-capture')">📸 Photo Capture</a>
+                    <a class="sidebar-link" onclick="switchSection('disease-detection')">🦠 Disease Detection</a>
+                    <a class="sidebar-link" onclick="switchSection('pest-management')">🐛 Pest Management</a>
+                    <a class="sidebar-link" onclick="switchSection('irrigation')">💧 Irrigation</a>
+                    <a class="sidebar-link" onclick="switchSection('market')">💰 Market Prices</a>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Resources</div>
+                    <a class="sidebar-link" onclick="switchSection('tutorials')">🎓 Video Tutorials</a>
+                    <a class="sidebar-link" onclick="switchSection('tips')">💡 Tips & Tricks</a>
+                    <a class="sidebar-link" onclick="switchSection('faq')">❓ FAQ</a>
+                    <a class="sidebar-link" onclick="switchSection('troubleshooting')">🔧 Troubleshooting</a>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Contact</div>
+                    <a class="sidebar-link" onclick="switchSection('contact')">📧 Contact Us</a>
+                </div>
+            </div>
+
+            <!-- Main Area -->
+            <div class="main-area">
+                <!-- Getting Started Section -->
+                <div id="getting-started" class="section active">
+                    <div class="section-title">
+                        <span class="section-icon">📌</span>
+                        <span>Getting Started with CropGuard AI</span>
+                    </div>
+                    <p class="section-description">
+                        Welcome! This guide will help you set up your account and start using CropGuard AI to optimize your farm management.
+                    </p>
+
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Create Your Account</h3>
+                                <p>Sign up with your email address and create a strong password. You can also link your social media accounts for quick login.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Add Your Farms</h3>
+                                <p>Navigate to Settings → Farms and add all your farms. Provide farm location, size, and primary crops for accurate recommendations.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>Set Your Preferences</h3>
+                                <p>Configure notification preferences, language, and units (metric/imperial). This helps personalize your experience.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h3>Upload Your First Photo</h3>
+                                <p>Go to Photo Capture module and take a crop photo. Our AI will analyze the image for diseases and provide recommendations.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h3>Monitor Your Dashboard</h3>
+                                <p>Check your dashboard daily for real-time farm health updates, weather forecasts, and AI recommendations.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basics Section -->
+                <div id="basics" class="section">
+                    <div class="section-title">
+                        <span class="section-icon">🎯</span>
+                        <span>CropGuard AI Basics</span>
+                    </div>
+                    <p class="section-description">
+                        Learn the fundamental concepts and features of CropGuard AI
+                    </p>
+
+                    <div class="tutorial-grid">
+                        <div class="tutorial-card" onclick="switchSection('photo-capture')">
+                            <div class="tutorial-icon">📸</div>
+                            <div class="tutorial-title">Photo Capture Module</div>
+                            <div class="tutorial-desc">Upload crop photos for AI analysis of plant health, diseases, and pest issues.</div>
+                        </div>
+
+                        <div class="tutorial-card" onclick="switchSection('dashboard')">
+                            <div class="tutorial-icon">📊</div>
+                            <div class="tutorial-title">Dashboard Overview</div>
+                            <div class="tutorial-desc">Monitor all your farms in one place with real-time health scores and alerts.</div>
+                        </div>
+
+                        <div class="tutorial-card" onclick="switchSection('weather')">
+                            <div class="tutorial-icon">🌦️</div>
+                            <div class="tutorial-title">Weather Integration</div>
+                            <div class="tutorial-desc">Get accurate weather forecasts and understand how weather impacts your crops.</div>
+                        </div>
+
+                        <div class="tutorial-card" onclick="switchSection('alerts')">
+                            <div class="tutorial-icon">🔔</div>
+                            <div class="tutorial-title">Alert System</div>
+                            <div class="tutorial-desc">Receive timely notifications about disease risks, pests, and weather changes.</div>
+                        </div>
+
+                        <div class="tutorial-card" onclick="switchSection('analytics')">
+                            <div class="tutorial-icon">📈</div>
+                            <div class="tutorial-title">Analytics & Reports</div>
+                            <div class="tutorial-desc">Analyze historical data and generate reports for better decision making.</div>
+                        </div>
+
+                        <div class="tutorial-card" onclick="switchSection('recommendations')">
+                            <div class="tutorial-icon">💡</div>
+                            <div class="tutorial-title">AI Recommendations</div>
+                            <div class="tutorial-desc">Get personalized recommendations for irrigation, fertilization, and pest management.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tutorials Section -->
+                <div id="tutorials" class="section">
+                    <div class="section-title">
+                        <span class="section-icon">🎓</span>
+                        <span>Video Tutorials</span>
+                    </div>
+                    <p class="section-description">
+                        Watch our comprehensive video tutorials to master CropGuard AI features
+                    </p>
+
+                    <div class="video-list">
+                        <div class="video-item" onclick="playVideo('intro')">
+                            <div class="video-thumb">▶️</div>
+                            <div class="video-info">
+                                <div class="video-title">Getting Started</div>
+                                <div class="video-duration">5:30 min</div>
+                            </div>
+                        </div>
+
+                        <div class="video-item" onclick="playVideo('photo')">
+                            <div class="video-thumb">📸</div>
+                            <div class="video-info">
+                                <div class="video-title">Photo Upload Guide</div>
+                                <div class="video-duration">4:15 min</div>
+                            </div>
+                        </div>
+
+                        <div class="video-item" onclick="playVideo('disease')">
+                            <div class="video-thumb">🦠</div>
+                            <div class="video-info">
+                                <div class="video-title">Disease Detection</div>
+                                <div class="video-duration">6:45 min</div>
+                            </div>
+                        </div>
+
+                        <div class="video-item" onclick="playVideo('irrigation')">
+                            <div class="video-thumb">💧</div>
+                            <div class="video-info">
+                                <div class="video-title">Irrigation Setup</div>
+                                <div class="video-duration">7:20 min</div>
+                            </div>
+                        </div>
+
+                        <div class="video-item" onclick="playVideo('market')">
+                            <div class="video-thumb">💰</div>
+                            <div class="video-info">
+                                <div class="video-title">Market Analysis</div>
+                                <div class="video-duration">5:50 min</div>
+                            </div>
+                        </div>
+
+                        <div class="video-item" onclick="playVideo('analytics')">
+                            <div class="video-thumb">📊</div>
+                            <div class="video-info">
+                                <div class="video-title">Analytics Dashboard</div>
+                                <div class="video-duration">8:10 min</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips & Tricks Section -->
+                <div id="tips" class="section">
+                    <div class="section-title">
+                        <span class="section-icon">💡</span>
+                        <span>Tips & Tricks</span>
+                    </div>
+
+                    <div class="tips-grid">
+                        <div class="tip-card">
+                            <div class="tip-number">1</div>
+                            <div class="tip-title">Best Time for Photos</div>
+                            <div class="tip-desc">Capture crop photos in morning light (6-9 AM) for accurate disease detection. Avoid harsh shadows.</div>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-number">2</div>
+                            <div class="tip-title">Regular Monitoring</div>
+                            <div class="tip-desc">Upload photos weekly or after weather events for early disease detection and intervention.</div>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-number">3</div>
+                            <div class="tip-title">Optimize Irrigation</div>
+                            <div class="tip-desc">Use soil moisture sensors with CropGuard for 20-30% water savings while maintaining yield.</div>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-number">4</div>
+                            <div class="tip-title">Market Timing</div>
+                            <div class="tip-desc">Check market prices daily and historical trends before selling. Best prices typically occur mid-week.</div>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-number">5</div>
+                            <div class="tip-title">Weather Alerts</div>
+                            <div class="tip-desc">Enable push notifications for weather changes to prepare irrigation and pest management accordingly.</div>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-number">6</div>
+                            <div class="tip-title">Data Backup</div>
+                            <div class="tip-desc">Regularly export your farm data. Go to Settings → Privacy and download historical records.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Section -->
+                <div id="faq" class="section">
+                    <div class="section-title">
+                        <span class="section-icon">❓</span>
+                        <span>Frequently Asked Questions</span>
+                    </div>
+
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <span>How accurate is the disease detection?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            Our AI model has 94.2% accuracy on common diseases like powdery mildew, early blight, and leaf rust. Accuracy improves with multiple photos from different angles. For best results, ensure good lighting and clear shots of affected areas.
+                        </div>
+                    </div>
+
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <span>Does CropGuard work offline?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            The app requires internet for photo analysis and real-time updates. However, your dashboard data is cached and available offline. Disease detection, weather, and market prices need internet connectivity.
+                        </div>
+                    </div>
+
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <span>How much water can I save with irrigation optimization?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            On average, farmers save 20-35% water while maintaining or increasing yields. Savings depend on your current practices, soil type, and crop. Real-time soil moisture monitoring is key to optimization.
+                        </div>
+                    </div>
+
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <span>Is my farm data private and secure?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            Yes! Your data is encrypted with SSL/TLS and stored securely on our servers. You have full control over data sharing preferences. We never sell your data. See our Privacy Policy for details.
+                        </div>
+                    </div>
+
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <span>How do I contact support?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            Email: support@cropguard.ai | Phone: +91 1800-123-4567 | Chat: Available on the dashboard (9 AM - 6 PM IST, Mon-Sat). Average response time: 2 hours.
+                        </div>
+                    </div>
+
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <span>What crops does CropGuard support?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            Currently: Wheat, Rice, Corn (Maize), Cotton, Sugarcane, Tomato, Potato, Onion, Cabbage, Brinjal, and many more. We're constantly adding new crops. Check the app for the complete list.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Troubleshooting Section -->
+                <div id="troubleshooting" class="section">
+                    <div class="section-title">
+                        <span class="section-icon">🔧</span>
+                        <span>Troubleshooting</span>
+                    </div>
+
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <span>Photos not uploading?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            1. Check internet connection<br>2. Ensure file size < 10MB<br>3. Try PNG/JPG format<br>4. Clear app cache<br>5. Restart the app<br>Contact support if issue persists.
+                        </div>
+                    </div>
+
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <span>Not receiving notifications?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            1. Check Settings → Notifications<br>2. Ensure notifications are enabled<br>3. Check browser permissions<br>4. Disable notification blockers<br>5. Test with manual refresh<br>Contact support if issue persists.
+                        </div>
+                    </div>
+
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <span>Dashboard not loading?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            1. Clear browser cache<br>2. Try different browser<br>3. Check internet connection<br>4. Disable extensions<br>5. Try incognito mode<br>Contact support with error details.
+                        </div>
+                    </div>
+
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <span>Password reset not working?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            1. Check spam folder for reset email<br>2. Verify email address is correct<br>3. Try different email domain<br>4. Wait 5 minutes before retry<br>5. Contact support for manual reset.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Section -->
+                <div id="contact" class="section">
+                    <div class="section-title">
+                        <span class="section-icon">📧</span>
+                        <span>Contact Us</span>
+                    </div>
+                    <p class="section-description">
+                        We're here to help! Reach out through your preferred channel.
+                    </p>
+
+                    <div style="background: #f8f9fa; padding: 25px; border-radius: 12px;">
+                        <h3 style="color: #1f2937; margin-bottom: 20px;">Support Channels</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                            <div>
+                                <h4 style="color: #667eea; margin-bottom: 10px;">📧 Email</h4>
+                                <p style="color: #666; line-height: 1.6;">
+                                    <strong>support@cropguard.ai</strong><br>
+                                    Response time: 2 hours<br>
+                                    Hours: 24/7
+                                </p>
+                            </div>
+                            <div>
+                                <h4 style="color: #667eea; margin-bottom: 10px;">📱 Phone</h4>
+                                <p style="color: #666; line-height: 1.6;">
+                                    <strong>+91 1800-123-4567</strong><br>
+                                    Hours: 9 AM - 6 PM IST<br>
+                                    Mon-Sat
+                                </p>
+                            </div>
+                            <div>
+                                <h4 style="color: #667eea; margin-bottom: 10px;">💬 Live Chat</h4>
+                                <p style="color: #666; line-height: 1.6;">
+                                    Available on dashboard<br>
+                                    Hours: 9 AM - 6 PM IST<br>
+                                    Average wait: <2 min
+                                </p>
+                            </div>
+                            <div>
+                                <h4 style="color: #667eea; margin-bottom: 10px;">🌐 Social Media</h4>
+                                <p style="color: #666; line-height: 1.6;">
+                                    @CropGuardAI on Twitter<br>
+                                    Message us anytime<br>
+                                    Response: Next business day
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class HelpSystem {
+            constructor() {
+                this.initialize();
+            }
+
+            initialize() {
+                console.log('Help System initialized');
+            }
+
+            switchSection(sectionId) {
+                // Hide all sections
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+
+                // Show selected section
+                document.getElementById(sectionId).classList.add('active');
+
+                // Update sidebar links
+                document.querySelectorAll('.sidebar-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                event.target.closest('.sidebar-link').classList.add('active');
+
+                // Scroll to top
+                document.querySelector('.main-area').scrollTop = 0;
+            }
+
+            toggleFAQ(element) {
+                element.classList.toggle('open');
+            }
+
+            searchHelp(query) {
+                console.log('Searching for:', query);
+            }
+
+            performSearch() {
+                const query = document.getElementById('searchInput').value;
+                alert('Searching for: ' + query);
+            }
+
+            playVideo(videoId) {
+                alert('Playing video: ' + videoId);
+            }
+        }
+
+        const helpSystem = new HelpSystem();
+
+        function switchSection(sectionId) {
+            helpSystem.switchSection(sectionId);
+        }
+
+        function toggleFAQ(element) {
+            helpSystem.toggleFAQ(element);
+        }
+
+        function searchHelp(query) {
+            helpSystem.searchHelp(query);
+        }
+
+        function performSearch() {
+            helpSystem.performSearch();
+        }
+
+        function playVideo(videoId) {
+            helpSystem.playVideo(videoId);
+        }
+    </script>
+</body>
+</html>
