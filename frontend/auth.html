@@ -13,12 +13,31 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #142C52 0%, #16808D 100%);
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
+        }
+
+        .brand-header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-align: left;
+            color: white;
+        }
+
+        .brand-header img {
+            height: 40px;
+            margin-bottom: 5px;
+        }
+
+        .brand-header p {
+            font-size: 12px;
+            opacity: 0.8;
         }
 
         .auth-container {
@@ -46,7 +65,7 @@
         }
 
         .auth-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1B9AAA 0%, #16808D 100%);
             color: white;
             padding: 30px 20px;
             text-align: center;
@@ -55,6 +74,11 @@
         .logo {
             font-size: 40px;
             margin-bottom: 10px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
         }
 
         .auth-header h1 {
@@ -103,8 +127,8 @@
         input[type="phone"]:focus,
         select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #1B9AAA;
+            box-shadow: 0 0 0 3px rgba(27, 154, 170, 0.1);
         }
 
         input::placeholder {
@@ -123,7 +147,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #667eea;
+            color: #1B9AAA;
             font-size: 18px;
         }
 
@@ -188,14 +212,14 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1B9AAA 0%, #16808D 100%);
             color: white;
             margin-top: 10px;
         }
 
         .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 20px rgba(27, 154, 170, 0.3);
         }
 
         .btn-primary:disabled {
@@ -228,7 +252,7 @@
         }
 
         .auth-toggle {
-            color: #667eea;
+            color: #1B9AAA;
             cursor: pointer;
             font-weight: 600;
         }
@@ -278,11 +302,13 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 18px;
+            color: transparent;
+            font-size: 0;
         }
 
         .social-btn:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
+            border-color: #1B9AAA;
+            background: #f0fafb;
         }
 
         .spinner {
@@ -311,7 +337,7 @@
         }
 
         .forgot-password-link {
-            color: #667eea;
+            color: #1B9AAA;
             font-size: 13px;
             cursor: pointer;
             text-align: right;
@@ -350,9 +376,9 @@
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <div class="logo">🌾</div>
+                <div class="logo"><img src="short_logo.png" alt="CropGuard AI"></div>
                 <h1>CropGuard AI</h1>
-                <p>Smart Crop Disease Detection</p>
+                <p>Designed by Civora Nexus | Smart Crop Disease Detection</p>
             </div>
 
             <div class="auth-body">
@@ -395,8 +421,8 @@
                     <div class="divider"><span>OR</span></div>
 
                     <div class="social-login">
-                        <button class="social-btn" title="Login with Google">🔵</button>
-                        <button class="social-btn" title="Login with GitHub">⚫</button>
+                        <button class="social-btn" title="Login with Google" style="background-image: url('https://www.gstatic.com/images/branding/product/1x/googleg_standard_color_128dp.png'); background-size: 24px; background-position: center; background-repeat: no-repeat;"></button>
+                        <button class="social-btn" title="Login with GitHub" style="background-image: url('social-icons/github.png'); background-size: 24px; background-position: center; background-repeat: no-repeat;"></button>
                     </div>
 
                     <div style="margin-top: 20px; text-align: center; color: #666; font-size: 14px;">
@@ -509,7 +535,7 @@
         // Authentication Module
         class AuthModule {
             constructor() {
-                this.apiBase = 'http://localhost:8000/api';
+                this.apiBase = 'http://localhost:8001/api';
                 this.setupEventListeners();
             }
 
@@ -584,28 +610,35 @@
                 }
 
                 try {
-                    const response = await fetch(`${this.apiBase}/auth/login/`, {
+                    console.log('Logging in with:', {email: email, password: '***'});
+                    const response = await fetch(`${this.apiBase}/auth/token/`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, password })
+                        body: JSON.stringify({ email: email, password })
                     });
 
+                    console.log('Login response status:', response.status);
+                    
                     if (response.ok) {
                         const data = await response.json();
+                        console.log('Login successful, storing tokens');
                         localStorage.setItem('access_token', data.access);
                         localStorage.setItem('refresh_token', data.refresh);
-                        localStorage.setItem('user', JSON.stringify(data.user));
+                        localStorage.setItem('user', JSON.stringify({username: email, id: 1}));
                         
-                        if (document.getElementById('rememberMe').checked) {
+                        if (document.getElementById('rememberMe')?.checked) {
                             localStorage.setItem('rememberEmail', email);
                         }
 
                         this.showMessage('success', 'Login successful! Redirecting...');
                         setTimeout(() => window.location.href = '/index.html', 1500);
                     } else {
-                        this.showMessage('error', 'Invalid email or password');
+                        const errorData = await response.json();
+                        console.log('Login error:', errorData);
+                        this.showMessage('error', errorData.detail || JSON.stringify(errorData) || 'Invalid email or password');
                     }
                 } catch (error) {
+                    console.error('Login exception:', error);
                     this.showMessage('error', 'Login failed: ' + error.message);
                 }
             }
@@ -637,27 +670,40 @@
                 }
 
                 try {
+                    console.log('Registering user:', {email, firstName, lastName});
                     const response = await fetch(`${this.apiBase}/auth/register/`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             first_name: firstName,
                             last_name: lastName,
-                            email,
+                            username: email,
+                            email: email,
+                            password: password,
+                            password2: password,
                             phone,
-                            state,
-                            password
+                            state
                         })
                     });
 
+                    console.log('Register response status:', response.status);
+                    
                     if (response.ok) {
+                        const data = await response.json();
+                        console.log('Registration successful:', data);
                         this.showMessage('success', 'Registration successful! Please login.');
                         setTimeout(() => showForm('loginForm'), 2000);
                     } else {
-                        const error = await response.json();
-                        this.showMessage('error', error.detail || 'Registration failed');
+                        const errorData = await response.json();
+                        console.log('Registration error:', errorData);
+                        const errorMsg = errorData.detail || 
+                                       errorData.non_field_errors?.[0] || 
+                                       JSON.stringify(errorData) ||
+                                       'Registration failed';
+                        this.showMessage('error', errorMsg);
                     }
                 } catch (error) {
+                    console.error('Registration exception:', error);
                     this.showMessage('error', 'Registration failed: ' + error.message);
                 }
             }
@@ -669,22 +715,7 @@
                     return;
                 }
 
-                try {
-                    const response = await fetch(`${this.apiBase}/auth/password-reset/`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email })
-                    });
-
-                    if (response.ok) {
-                        this.showMessage('success', 'Reset link sent to your email!');
-                        setTimeout(() => showForm('loginForm'), 2000);
-                    } else {
-                        this.showMessage('error', 'Email not found');
-                    }
-                } catch (error) {
-                    this.showMessage('error', 'Failed to send reset link: ' + error.message);
-                }
+                this.showMessage('error', 'Password reset feature coming soon. Please contact support.');
             }
         }
 
@@ -721,11 +752,18 @@
         // Initialize
         const authModule = new AuthModule();
 
-        // Load remembered email
+        // Load remembered email and check session
         window.addEventListener('load', () => {
             const remembered = localStorage.getItem('rememberEmail');
             if (remembered) {
                 document.getElementById('loginEmail').value = remembered;
+            }
+
+            // Check if user already has valid token
+            const accessToken = localStorage.getItem('access_token');
+            if (accessToken) {
+                // Token exists, redirect to dashboard
+                window.location.href = '/index.html';
             }
         });
     </script>

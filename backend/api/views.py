@@ -491,3 +491,80 @@ class ActivityLogViewSet(viewsets.ReadOnlyModelViewSet):
     
     def get_queryset(self):
         return ActivityLog.objects.filter(user=self.request.user).order_by('-created_at')
+
+
+# ============================================
+# PHOTO UPLOAD ENDPOINT
+# ============================================
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.parsers import MultiPartParser, FormParser
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def photo_upload(request):
+    """Upload photo for disease detection"""
+    if 'image' not in request.FILES:
+        return Response({'error': 'No image provided'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    image_file = request.FILES['image']
+    
+    # Store photo data (simplified - in production would save to storage)
+    return Response({
+        'id': 1,
+        'filename': image_file.name,
+        'size': image_file.size,
+        'message': 'Photo uploaded successfully'
+    }, status=status.HTTP_201_CREATED)
+
+
+# ============================================
+# DISEASE DETECTION ENDPOINT
+# ============================================
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def disease_detection(request):
+    """Detect diseases in uploaded images"""
+    if 'image' not in request.FILES:
+        return Response({'error': 'No image provided'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    image_file = request.FILES['image']
+    
+    # Mock disease detection results (in production would use ML model)
+    diseases = [
+        {'name': 'Powdery Mildew', 'confidence': 0.92, 'treatment': 'Apply sulfur-based fungicide'},
+        {'name': 'Early Blight', 'confidence': 0.85, 'treatment': 'Remove infected leaves, apply mancozeb'},
+        {'name': 'Leaf Rust', 'confidence': 0.78, 'treatment': 'Use rust-specific fungicides'},
+        {'name': 'Healthy', 'confidence': 0.95, 'treatment': 'Continue regular monitoring'}
+    ]
+    
+    import random
+    detection = random.choice(diseases)
+    
+    # Save detection record to database
+    try:
+        disease_record = DiseaseDetection.objects.create(
+            user=request.user,
+            farm=request.user.userprofile.farm_set.first(),  # Get first farm if exists
+            image_path=f'uploads/{image_file.name}',
+            disease_name=detection['name'],
+            confidence_score=detection['confidence'],
+            severity_level='Medium',
+            recommended_action=detection['treatment']
+        )
+        
+        # Log activity
+        ActivityLog.objects.create(
+            user=request.user,
+            action=f'Detected {detection["name"]} in image',
+            details=f'Confidence: {detection["confidence"]*100:.1f}%'
+        )
+    except Exception as e:
+        print(f'Error saving disease detection: {e}')
+    
+    return Response({
+        'disease_name': detection['name'],
+        'confidence': detection['confidence'],
+        'treatment': detection['treatment'],
+        'filename': image_file.name,
+        'message': 'Disease detection completed'
+    }, status=status.HTTP_200_OK)

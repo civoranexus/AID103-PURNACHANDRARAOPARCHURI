@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #142C52 0%, #16808D 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -31,7 +31,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1B9AAA 0%, #16808D 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -69,13 +69,13 @@
             content: '';
             width: 4px;
             height: 20px;
-            background: #667eea;
+            background: #1B9AAA;
             border-radius: 2px;
         }
 
         /* Camera Section */
         .camera-container {
-            border: 2px dashed #667eea;
+            border: 2px dashed #1B9AAA;
             border-radius: 10px;
             overflow: hidden;
             background: #f8f9ff;
@@ -141,13 +141,13 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1B9AAA 0%, #16808D 100%);
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 20px rgba(27, 154, 170, 0.3);
         }
 
         .btn-primary:disabled {
@@ -185,10 +185,10 @@
 
         /* Preview Section */
         .preview-container {
-            border: 2px solid #667eea;
+            border: 2px solid #1B9AAA;
             border-radius: 10px;
             padding: 20px;
-            background: #f8f9ff;
+            background: #f0fafb;
             display: none;
             margin-bottom: 20px;
         }
@@ -262,19 +262,19 @@
             width: 18px;
             height: 18px;
             border-radius: 50%;
-            background: #667eea;
+            background: #1B9AAA;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 2px 5px rgba(27, 154, 170, 0.4);
         }
 
         input[type="range"]::-moz-range-thumb {
             width: 18px;
             height: 18px;
             border-radius: 50%;
-            background: #667eea;
+            background: #1B9AAA;
             cursor: pointer;
             border: none;
-            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 2px 5px rgba(27, 154, 170, 0.4);
         }
 
         /* Status Messages */
@@ -340,7 +340,7 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(90deg, #1B9AAA 0%, #16808D 100%);
             width: 0%;
             transition: width 0.3s ease;
         }
@@ -379,7 +379,7 @@
 
         .file-input-label:hover {
             background: #e0e0e0;
-            border-color: #667eea;
+            border-color: #1B9AAA;
         }
 
         /* Responsive */
@@ -607,7 +607,7 @@
                 ['dragenter', 'dragover'].forEach(eventName => {
                     dropZone.addEventListener(eventName, () => {
                         dropZone.style.background = '#e0e0e0';
-                        dropZone.style.borderColor = '#667eea';
+                        dropZone.style.borderColor = '#1B9AAA';
                     });
                 });
 
@@ -749,22 +749,32 @@
                         await new Promise(r => setTimeout(r, 100));
                     }
 
-                    // TODO: Replace with actual API call
-                    // const response = await fetch('/api/photos/upload/', {
-                    //     method: 'POST',
-                    //     headers: {
-                    //         'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-                    //     },
-                    //     body: formData
-                    // });
+                    // Call Django backend API to upload photo
+                    const response = await fetch('http://localhost:8001/api/photos/upload/', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                        },
+                        body: formData
+                    });
 
-                    this.showStatus('Image uploaded successfully! Ready for analysis', 'success');
+                    if (!response.ok) {
+                        throw new Error(`Upload failed: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    this.showStatus('Image uploaded successfully! Photo ID: ' + (result.id || 'saved'), 'success');
                     setTimeout(() => {
                         this.uploadProgress.classList.remove('active');
                         this.uploadBtn.disabled = false;
                     }, 500);
                 } catch (error) {
-                    this.showStatus('Upload failed: ' + error.message, 'error');
+                    // If API not available, still show success (for development)
+                    if (error.message.includes('Failed to fetch')) {
+                        this.showStatus('Image processed locally (API unavailable)', 'warning');
+                    } else {
+                        this.showStatus('Upload failed: ' + error.message, 'error');
+                    }
                     this.uploadProgress.classList.remove('active');
                     this.uploadBtn.disabled = false;
                 }

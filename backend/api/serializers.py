@@ -39,21 +39,25 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """Serializer for user registration"""
     password = serializers.CharField(write_only=True, min_length=8)
-    password_confirm = serializers.CharField(write_only=True, min_length=8)
+    password2 = serializers.CharField(write_only=True, min_length=8, required=False)
+    phone = serializers.CharField(required=False, allow_blank=True)
+    state = serializers.CharField(required=False, allow_blank=True)
     
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'password_confirm', 'first_name', 'last_name']
+        fields = ['username', 'email', 'password', 'password2', 'first_name', 'last_name', 'phone', 'state']
     
     def validate(self, data):
-        if data['password'] != data['password_confirm']:
+        password2 = data.pop('password2', None)
+        if password2 and data['password'] != password2:
             raise serializers.ValidationError({"password": "Passwords do not match."})
         return data
     
     def create(self, validated_data):
-        validated_data.pop('password_confirm')
+        phone = validated_data.pop('phone', '')
+        state = validated_data.pop('state', '')
         user = User.objects.create_user(**validated_data)
-        UserProfile.objects.create(user=user)
+        UserProfile.objects.create(user=user, phone=phone, state=state)
         return user
 
 

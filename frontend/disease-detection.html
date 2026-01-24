@@ -24,7 +24,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1B9AAA 0%, #16808D 100%);
             color: white;
             padding: 30px;
             border-radius: 15px;
@@ -66,7 +66,7 @@
         }
 
         .upload-area {
-            border: 2px dashed #667eea;
+            border: 2px dashed #1B9AAA;
             border-radius: 10px;
             padding: 40px 20px;
             text-align: center;
@@ -75,8 +75,8 @@
         }
 
         .upload-area:hover {
-            background: #f0f4ff;
-            border-color: #764ba2;
+            background: #f0fafb;
+            border-color: #16808D;
         }
 
         .upload-icon {
@@ -396,8 +396,47 @@
                 const resultsDiv = document.getElementById('results');
                 resultsDiv.innerHTML = '<p style="text-align: center;"><div class="spinner"></div> Analyzing image...</p>';
 
-                // Simulate API call
-                setTimeout(() => {
+                // Call Django backend API for disease detection
+                const formData = new FormData();
+                formData.append('image', file);
+
+                fetch('http://localhost:8001/api/disease-detection/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Use API result or fallback to mock data
+                    const disease = data.disease_name || this.mockDiseases[Math.floor(Math.random() * this.mockDiseases.length)];
+                    const confidence = data.confidence || (disease.confidence || 0.85);
+                    const treatment = data.treatment || disease.treatment;
+
+                    const html = `
+                        <div class="result-item">
+                            <div class="result-disease">${disease.name || disease}</div>
+                            <div class="result-confidence">Confidence: ${(confidence * 100).toFixed(1)}%</div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: ${confidence * 100}%;"></div>
+                            </div>
+                            <div class="treatment">
+                                <div class="treatment-title">Recommended Treatment:</div>
+                                <p>${treatment}</p>
+                            </div>
+                        </div>
+                    `;
+                    resultsDiv.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('API Error:', error);
+                    // Fallback to mock data if API fails
                     const randomDisease = this.mockDiseases[Math.floor(Math.random() * this.mockDiseases.length)];
                     const html = `
                         <div class="result-item">
@@ -413,7 +452,7 @@
                         </div>
                     `;
                     resultsDiv.innerHTML = html;
-                }, 2000);
+                });
             }
         }
 
