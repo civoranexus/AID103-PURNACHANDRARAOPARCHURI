@@ -1,818 +1,334 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Capture Module - CropGuard AI</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo Capture Module - CropGuard AI</title>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #142C52 0%, #16808D 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
 
-        .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 800px;
-            width: 100%;
-            overflow: hidden;
-        }
+body{
+    font-family:Segoe UI,Tahoma;
+    background:linear-gradient(135deg,#142C52,#16808D);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px
+}
 
-        .header {
-            background: linear-gradient(135deg, #1B9AAA 0%, #16808D 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
+.container{
+    background:#fff;
+    border-radius:15px;
+    box-shadow:0 20px 60px rgba(0,0,0,.3);
+    max-width:800px;
+    width:100%;
+    overflow:hidden
+}
 
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
+.header{
+    background:linear-gradient(135deg,#1B9AAA,#16808D);
+    color:#fff;
+    padding:30px;
+    text-align:center
+}
 
-        .header p {
-            opacity: 0.9;
-            font-size: 14px;
-        }
+.content{padding:30px}
+.section{margin-bottom:30px}
 
-        .content {
-            padding: 30px;
-        }
+.section-title{
+    font-size:18px;
+    font-weight:600;
+    margin-bottom:15px;
+    display:flex;
+    gap:10px;
+    align-items:center
+}
 
-        .section {
-            margin-bottom: 30px;
-        }
+.section-title::before{
+    content:'';
+    width:4px;height:20px;
+    background:#1B9AAA;
+    border-radius:2px
+}
 
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+.camera-container{
+    border:2px dashed #1B9AAA;
+    border-radius:10px;
+    overflow:hidden;
+    background:#f8f9ff
+}
 
-        .section-title::before {
-            content: '';
-            width: 4px;
-            height: 20px;
-            background: #1B9AAA;
-            border-radius: 2px;
-        }
+#cameraFeed{
+    width:100%;
+    height:400px;
+    display:none;
+    object-fit:cover;
+    background:black
+}
 
-        /* Camera Section */
-        .camera-container {
-            border: 2px dashed #1B9AAA;
-            border-radius: 10px;
-            overflow: hidden;
-            background: #f8f9ff;
-            position: relative;
-        }
+.camera-placeholder{
+    height:400px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#666;
+    font-size:24px
+}
 
-        #cameraFeed {
-            width: 100%;
-            height: 400px;
-            background: #000;
-            border-radius: 8px;
-            display: none;
-            object-fit: cover;
-        }
+.button-group{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:15px 0
+}
 
-        .camera-placeholder {
-            width: 100%;
-            height: 400px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 15px;
-            color: #666;
-        }
+button{
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600
+}
 
-        .camera-icon {
-            font-size: 60px;
-        }
+.btn-primary{background:#1B9AAA;color:white}
+.btn-secondary{background:#eee}
+.btn-danger{background:#ff6b6b;color:white}
+.btn-success{background:#51cf66;color:white}
 
-        /* Canvas for cropping */
-        #cropCanvas {
-            width: 100%;
-            max-height: 400px;
-            border-radius: 8px;
-            display: none;
-            margin-top: 10px;
-        }
+.preview-container{
+    display:none;
+    border:2px solid #1B9AAA;
+    padding:20px;
+    border-radius:10px
+}
 
-        /* Buttons */
-        .button-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
+.preview-container.active{display:block}
 
-        button {
-            flex: 1;
-            min-width: 120px;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+#photoPreview{
+    width:100%;
+    max-height:400px;
+    border-radius:8px
+}
 
-        .btn-primary {
-            background: linear-gradient(135deg, #1B9AAA 0%, #16808D 100%);
-            color: white;
-        }
+.crop-controls{display:none;margin-top:15px}
+.crop-controls.active{display:block}
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(27, 154, 170, 0.3);
-        }
+input[type=range]{width:100%}
 
-        .btn-primary:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
+.status-message{
+    display:none;
+    padding:15px;
+    border-radius:8px;
+    margin-bottom:15px
+}
 
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-        }
+.status-message.show{display:block}
+.status-message.success{background:#d4edda;color:#155724}
+.status-message.error{background:#f8d7da;color:#721c24}
+.status-message.info{background:#d1ecf1;color:#0c5460}
 
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
+.upload-progress{display:none;margin-bottom:15px}
+.upload-progress.active{display:block}
 
-        .btn-danger {
-            background: #ff6b6b;
-            color: white;
-        }
+.progress-bar{
+    height:8px;
+    background:#ddd;
+    border-radius:4px;
+    overflow:hidden
+}
 
-        .btn-danger:hover {
-            background: #ff5252;
-        }
-
-        .btn-success {
-            background: #51cf66;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #40c057;
-        }
-
-        /* Preview Section */
-        .preview-container {
-            border: 2px solid #1B9AAA;
-            border-radius: 10px;
-            padding: 20px;
-            background: #f0fafb;
-            display: none;
-            margin-bottom: 20px;
-        }
-
-        .preview-container.active {
-            display: block;
-        }
-
-        #photoPreview {
-            width: 100%;
-            max-height: 400px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            object-fit: contain;
-        }
-
-        .preview-info {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        .preview-info p {
-            margin: 8px 0;
-            color: #555;
-            font-size: 14px;
-        }
-
-        .preview-info strong {
-            color: #333;
-        }
-
-        /* Crop Controls */
-        .crop-controls {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .crop-controls.active {
-            display: block;
-        }
-
-        .slider-group {
-            margin-bottom: 15px;
-        }
-
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: #ddd;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #1B9AAA;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(27, 154, 170, 0.4);
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #1B9AAA;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 5px rgba(27, 154, 170, 0.4);
-        }
-
-        /* Status Messages */
-        .status-message {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-            animation: slideIn 0.3s ease;
-        }
-
-        .status-message.show {
-            display: block;
-        }
-
-        .status-message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status-message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .status-message.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Upload Progress */
-        .upload-progress {
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .upload-progress.active {
-            display: block;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #1B9AAA 0%, #16808D 100%);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .progress-text {
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-        }
-
-        /* File Input */
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .file-input-wrapper input[type="file"] {
-            position: absolute;
-            left: -9999px;
-        }
-
-        .file-input-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 15px;
-            background: #f0f0f0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .file-input-label:hover {
-            background: #e0e0e0;
-            border-color: #1B9AAA;
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            .header h1 {
-                font-size: 22px;
-            }
-
-            button {
-                min-width: 100px;
-                padding: 10px 15px;
-                font-size: 12px;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            button {
-                flex: none;
-            }
-
-            #cameraFeed,
-            .camera-placeholder {
-                height: 300px;
-            }
-        }
-
-        /* Spinner Animation */
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
+.progress-fill{
+    height:100%;
+    width:0%;
+    background:#1B9AAA
+}
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📸 Photo Capture Module</h1>
-            <p>Capture and analyze crop disease images for accurate diagnosis</p>
-        </div>
 
-        <div class="content">
-            <!-- Status Messages -->
-            <div id="statusMessage" class="status-message"></div>
+<div class="container">
+<div class="header">
+<h1>📸 Photo Capture Module</h1>
+<p>CropGuard AI Image Capture</p>
+</div>
 
-            <!-- Camera Section -->
-            <div class="section">
-                <div class="section-title">Camera Options</div>
-                <div class="button-group">
-                    <button class="btn-primary" id="startCameraBtn">
-                        <span>📷</span> Start Camera
-                    </button>
-                    <button class="btn-secondary" id="stopCameraBtn" disabled>
-                        <span>⏹</span> Stop Camera
-                    </button>
-                    <button class="btn-success" id="captureBtn" disabled>
-                        <span>📸</span> Capture Photo
-                    </button>
-                </div>
+<div class="content">
 
-                <div class="camera-container">
-                    <video id="cameraFeed" playsinline></video>
-                    <div id="cameraPlaceholder" class="camera-placeholder">
-                        <div class="camera-icon">📷</div>
-                        <p>Click "Start Camera" to capture photos</p>
-                    </div>
-                </div>
-            </div>
+<div id="statusMessage" class="status-message"></div>
 
-            <!-- File Upload Section -->
-            <div class="section">
-                <div class="section-title">Upload from Device</div>
-                <div class="file-input-wrapper">
-                    <input type="file" id="fileInput" accept="image/*" />
-                    <label for="fileInput" class="file-input-label">
-                        <span>📁</span> Choose Image or Drag & Drop
-                    </label>
-                </div>
-            </div>
+<div class="section">
+<div class="section-title">Camera</div>
 
-            <!-- Preview Section -->
-            <div class="preview-container" id="previewContainer">
-                <img id="photoPreview" alt="Photo preview" />
-                <div class="preview-info">
-                    <p><strong>File Name:</strong> <span id="fileName">-</span></p>
-                    <p><strong>File Size:</strong> <span id="fileSize">-</span></p>
-                    <p><strong>Dimensions:</strong> <span id="dimensions">-</span></p>
-                    <p><strong>Upload Date:</strong> <span id="uploadDate">-</span></p>
-                </div>
-            </div>
+<div class="button-group">
+<button id="startCameraBtn" class="btn-primary">Start Camera</button>
+<button id="stopCameraBtn" class="btn-secondary" disabled>Stop Camera</button>
+<button id="captureBtn" class="btn-success" disabled>Capture</button>
+</div>
 
-            <!-- Crop Controls -->
-            <div class="crop-controls" id="cropControls">
-                <div class="section-title">Crop Image</div>
-                
-                <div class="slider-group">
-                    <div class="slider-label">
-                        <span>Brightness</span>
-                        <span id="brightnessValue">100%</span>
-                    </div>
-                    <input type="range" id="brightnessSlider" min="0" max="200" value="100" />
-                </div>
+<div class="camera-container">
+<video id="cameraFeed" playsinline></video>
+<div id="cameraPlaceholder" class="camera-placeholder">📷 Camera Off</div>
+</div>
+</div>
 
-                <div class="slider-group">
-                    <div class="slider-label">
-                        <span>Contrast</span>
-                        <span id="contrastValue">100%</span>
-                    </div>
-                    <input type="range" id="contrastSlider" min="0" max="200" value="100" />
-                </div>
+<div class="section">
+<div class="section-title">Upload Image</div>
+<input type="file" id="fileInput" accept="image/*">
+</div>
 
-                <div class="slider-group">
-                    <div class="slider-label">
-                        <span>Saturation</span>
-                        <span id="saturationValue">100%</span>
-                    </div>
-                    <input type="range" id="saturationSlider" min="0" max="200" value="100" />
-                </div>
+<div id="previewContainer" class="preview-container">
+<img id="photoPreview">
+</div>
 
-                <div class="button-group">
-                    <button class="btn-secondary" id="resetFiltersBtn">Reset Filters</button>
-                    <button class="btn-primary" id="downloadBtn">Download Cropped Image</button>
-                </div>
-            </div>
+<div id="cropControls" class="crop-controls">
+<label>Brightness</label>
+<input type="range" id="brightness" min="0" max="200" value="100">
 
-            <!-- Upload Progress -->
-            <div class="upload-progress" id="uploadProgress">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div class="progress-text" id="progressText">Uploading... 0%</div>
-            </div>
+<label>Contrast</label>
+<input type="range" id="contrast" min="0" max="200" value="100">
 
-            <!-- Action Buttons -->
-            <div class="button-group">
-                <button class="btn-primary" id="uploadBtn" disabled>
-                    <span>☁️</span> Upload to Server
-                </button>
-                <button class="btn-danger" id="clearBtn">
-                    <span>🗑️</span> Clear All
-                </button>
-            </div>
-        </div>
-    </div>
+<label>Saturation</label>
+<input type="range" id="saturation" min="0" max="200" value="100">
+</div>
 
-    <script>
-        // Photo Capture Module - JavaScript
-        class PhotoCaptureModule {
-            constructor() {
-                this.stream = null;
-                this.capturedImage = null;
-                this.originalImage = null;
+<div id="uploadProgress" class="upload-progress">
+<div class="progress-bar">
+<div id="progressFill" class="progress-fill"></div>
+</div>
+</div>
 
-                // DOM Elements
-                this.cameraFeed = document.getElementById('cameraFeed');
-                this.cameraPlaceholder = document.getElementById('cameraPlaceholder');
-                this.startCameraBtn = document.getElementById('startCameraBtn');
-                this.stopCameraBtn = document.getElementById('stopCameraBtn');
-                this.captureBtn = document.getElementById('captureBtn');
-                this.fileInput = document.getElementById('fileInput');
-                this.previewContainer = document.getElementById('previewContainer');
-                this.photoPreview = document.getElementById('photoPreview');
-                this.uploadBtn = document.getElementById('uploadBtn');
-                this.clearBtn = document.getElementById('clearBtn');
-                this.cropControls = document.getElementById('cropControls');
-                this.statusMessage = document.getElementById('statusMessage');
-                this.uploadProgress = document.getElementById('uploadProgress');
+<div class="button-group">
+<button id="uploadBtn" class="btn-primary" disabled>Upload</button>
+<button id="clearBtn" class="btn-danger">Clear</button>
+</div>
 
-                this.setupEventListeners();
-                this.setupDragAndDrop();
-            }
+</div>
+</div>
 
-            setupEventListeners() {
-                this.startCameraBtn.addEventListener('click', () => this.startCamera());
-                this.stopCameraBtn.addEventListener('click', () => this.stopCamera());
-                this.captureBtn.addEventListener('click', () => this.capturePhoto());
-                this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
-                this.uploadBtn.addEventListener('click', () => this.uploadPhoto());
-                this.clearBtn.addEventListener('click', () => this.clearAll());
+<script>
+class PhotoCaptureModule {
+    constructor(){
+        this.stream=null;
+        this.image=null;
 
-                // Crop controls
-                document.getElementById('brightnessSlider').addEventListener('input', (e) => {
-                    document.getElementById('brightnessValue').textContent = e.target.value + '%';
-                    this.applyFilters();
-                });
+        this.cameraFeed=cameraFeed;
+        this.startCameraBtn=startCameraBtn;
+        this.stopCameraBtn=stopCameraBtn;
+        this.captureBtn=captureBtn;
+        this.fileInput=fileInput;
+        this.previewContainer=previewContainer;
+        this.photoPreview=photoPreview;
+        this.uploadBtn=uploadBtn;
+        this.clearBtn=clearBtn;
+        this.statusMessage=statusMessage;
+        this.uploadProgress=uploadProgress;
+        this.progressFill=progressFill;
 
-                document.getElementById('contrastSlider').addEventListener('input', (e) => {
-                    document.getElementById('contrastValue').textContent = e.target.value + '%';
-                    this.applyFilters();
-                });
+        this.init();
+    }
 
-                document.getElementById('saturationSlider').addEventListener('input', (e) => {
-                    document.getElementById('saturationValue').textContent = e.target.value + '%';
-                    this.applyFilters();
-                });
+    init(){
+        this.startCameraBtn.onclick=()=>this.startCamera();
+        this.stopCameraBtn.onclick=()=>this.stopCamera();
+        this.captureBtn.onclick=()=>this.capturePhoto();
+        this.fileInput.onchange=e=>this.loadFile(e.target.files[0]);
+        this.uploadBtn.onclick=()=>this.uploadDemo();
+        this.clearBtn.onclick=()=>this.clearAll();
 
-                document.getElementById('resetFiltersBtn').addEventListener('click', () => this.resetFilters());
-                document.getElementById('downloadBtn').addEventListener('click', () => this.downloadImage());
-            }
-
-            setupDragAndDrop() {
-                const dropZone = document.querySelector('.file-input-wrapper');
-                
-                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                    dropZone.addEventListener(eventName, preventDefaults, false);
-                });
-
-                function preventDefaults(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-
-                ['dragenter', 'dragover'].forEach(eventName => {
-                    dropZone.addEventListener(eventName, () => {
-                        dropZone.style.background = '#e0e0e0';
-                        dropZone.style.borderColor = '#1B9AAA';
-                    });
-                });
-
-                ['dragleave', 'drop'].forEach(eventName => {
-                    dropZone.addEventListener(eventName, () => {
-                        dropZone.style.background = '#f0f0f0';
-                        dropZone.style.borderColor = 'transparent';
-                    });
-                });
-
-                dropZone.addEventListener('drop', (e) => {
-                    const dt = e.dataTransfer;
-                    const files = dt.files;
-                    if (files.length > 0) {
-                        this.loadImageFromFile(files[0]);
-                    }
-                });
-            }
-
-            async startCamera() {
-                try {
-                    this.stream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: 'environment' }
-                    });
-                    this.cameraFeed.srcObject = this.stream;
-                    this.cameraFeed.style.display = 'block';
-                    this.cameraPlaceholder.style.display = 'none';
-                    this.startCameraBtn.disabled = true;
-                    this.stopCameraBtn.disabled = false;
-                    this.captureBtn.disabled = false;
-                    this.showStatus('Camera started successfully', 'success');
-                } catch (error) {
-                    this.showStatus('Error accessing camera: ' + error.message, 'error');
-                }
-            }
-
-            stopCamera() {
-                if (this.stream) {
-                    this.stream.getTracks().forEach(track => track.stop());
-                    this.cameraFeed.style.display = 'none';
-                    this.cameraPlaceholder.style.display = 'flex';
-                    this.startCameraBtn.disabled = false;
-                    this.stopCameraBtn.disabled = true;
-                    this.captureBtn.disabled = true;
-                    this.showStatus('Camera stopped', 'info');
-                }
-            }
-
-            capturePhoto() {
-                const canvas = document.createElement('canvas');
-                canvas.width = this.cameraFeed.videoWidth;
-                canvas.height = this.cameraFeed.videoHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(this.cameraFeed, 0, 0);
-                
-                this.capturedImage = canvas.toDataURL('image/jpeg');
-                this.originalImage = this.capturedImage;
-                this.displayPreview(this.capturedImage, 'Camera Capture');
-                this.showStatus('Photo captured successfully', 'success');
-            }
-
-            handleFileSelect(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    this.loadImageFromFile(file);
-                }
-            }
-
-            loadImageFromFile(file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.capturedImage = e.target.result;
-                    this.originalImage = e.target.result;
-                    this.displayPreview(e.target.result, file.name);
-                    this.showStatus('Image loaded successfully', 'success');
-                };
-                reader.readAsDataURL(file);
-            }
-
-            displayPreview(imageData, fileName) {
-                this.photoPreview.src = imageData;
-                this.photoPreview.onload = () => {
-                    document.getElementById('fileName').textContent = fileName;
-                    document.getElementById('fileSize').textContent = this.formatFileSize(imageData.length);
-                    document.getElementById('dimensions').textContent = 
-                        `${this.photoPreview.width} x ${this.photoPreview.height}px`;
-                    document.getElementById('uploadDate').textContent = new Date().toLocaleString();
-                };
-
-                this.previewContainer.classList.add('active');
-                this.cropControls.classList.add('active');
-                this.uploadBtn.disabled = false;
-            }
-
-            applyFilters() {
-                const brightness = document.getElementById('brightnessSlider').value;
-                const contrast = document.getElementById('contrastSlider').value;
-                const saturation = document.getElementById('saturationSlider').value;
-
-                this.photoPreview.style.filter = 
-                    `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-            }
-
-            resetFilters() {
-                document.getElementById('brightnessSlider').value = 100;
-                document.getElementById('contrastSlider').value = 100;
-                document.getElementById('saturationSlider').value = 100;
-                
-                document.getElementById('brightnessValue').textContent = '100%';
-                document.getElementById('contrastValue').textContent = '100%';
-                document.getElementById('saturationValue').textContent = '100%';
-
-                this.applyFilters();
-                this.showStatus('Filters reset', 'info');
-            }
-
-            async downloadImage() {
-                const link = document.createElement('a');
-                link.href = this.capturedImage;
-                link.download = `crop-guard-${Date.now()}.jpg`;
-                link.click();
-                this.showStatus('Image downloaded successfully', 'success');
-            }
-
-            async uploadPhoto() {
-                if (!this.capturedImage) {
-                    this.showStatus('No image to upload', 'error');
-                    return;
-                }
-
-                this.uploadProgress.classList.add('active');
-                this.uploadBtn.disabled = true;
-
-                try {
-                    // Simulating upload progress
-                    for (let i = 0; i <= 100; i += 10) {
-                        document.getElementById('progressFill').style.width = i + '%';
-                        document.getElementById('progressText').textContent = `Uploading... ${i}%`;
-                        await new Promise(r => setTimeout(r, 100));
-                    }
-
-                    // Call Django backend API to upload photo
-                    const response = await fetch('http://localhost:8001/api/photos/upload/', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-                        },
-                        body: formData
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`Upload failed: ${response.status}`);
-                    }
-
-                    const result = await response.json();
-                    this.showStatus('Image uploaded successfully! Photo ID: ' + (result.id || 'saved'), 'success');
-                    setTimeout(() => {
-                        this.uploadProgress.classList.remove('active');
-                        this.uploadBtn.disabled = false;
-                    }, 500);
-                } catch (error) {
-                    // If API not available, still show success (for development)
-                    if (error.message.includes('Failed to fetch')) {
-                        this.showStatus('Image processed locally (API unavailable)', 'warning');
-                    } else {
-                        this.showStatus('Upload failed: ' + error.message, 'error');
-                    }
-                    this.uploadProgress.classList.remove('active');
-                    this.uploadBtn.disabled = false;
-                }
-            }
-
-            clearAll() {
-                this.capturedImage = null;
-                this.originalImage = null;
-                this.photoPreview.src = '';
-                this.previewContainer.classList.remove('active');
-                this.cropControls.classList.remove('active');
-                this.fileInput.value = '';
-                this.uploadBtn.disabled = true;
-                this.resetFilters();
-                this.showStatus('All cleared', 'info');
-            }
-
-            formatFileSize(bytes) {
-                if (bytes === 0) return '0 Bytes';
-                const k = 1024;
-                const sizes = ['Bytes', 'KB', 'MB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-            }
-
-            showStatus(message, type) {
-                this.statusMessage.textContent = message;
-                this.statusMessage.className = `status-message ${type} show`;
-                setTimeout(() => {
-                    this.statusMessage.classList.remove('show');
-                }, 4000);
-            }
-        }
-
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            new PhotoCaptureModule();
+        ['brightness','contrast','saturation'].forEach(id=>{
+            document.getElementById(id).oninput=()=>this.applyFilters();
         });
-    </script>
+    }
+
+    async startCamera(){
+        try{
+            this.stream=await navigator.mediaDevices.getUserMedia({video:true});
+            this.cameraFeed.srcObject=this.stream;
+            await this.cameraFeed.play();
+
+            this.cameraFeed.style.display='block';
+            cameraPlaceholder.style.display='none';
+            this.captureBtn.disabled=false;
+            this.stopCameraBtn.disabled=false;
+            this.startCameraBtn.disabled=true;
+
+            this.showStatus("Camera started","success");
+        }catch(e){
+            this.showStatus(e.message,"error");
+        }
+    }
+
+    stopCamera(){
+        this.stream?.getTracks().forEach(t=>t.stop());
+        this.cameraFeed.style.display='none';
+        cameraPlaceholder.style.display='flex';
+        this.startCameraBtn.disabled=false;
+        this.captureBtn.disabled=true;
+        this.stopCameraBtn.disabled=true;
+    }
+
+    capturePhoto(){
+        const c=document.createElement('canvas');
+        c.width=this.cameraFeed.videoWidth;
+        c.height=this.cameraFeed.videoHeight;
+        c.getContext('2d').drawImage(this.cameraFeed,0,0);
+        this.image=c.toDataURL('image/jpeg');
+        this.showPreview(this.image);
+    }
+
+    loadFile(file){
+        const r=new FileReader();
+        r.onload=e=>{
+            this.image=e.target.result;
+            this.showPreview(this.image);
+        };
+        r.readAsDataURL(file);
+    }
+
+    showPreview(src){
+        this.photoPreview.src=src;
+        this.previewContainer.classList.add('active');
+        cropControls.classList.add('active');
+        this.uploadBtn.disabled=false;
+    }
+
+    applyFilters(){
+        this.photoPreview.style.filter=
+        `brightness(${brightness.value}%)
+         contrast(${contrast.value}%)
+         saturate(${saturation.value}%)`;
+    }
+
+    async uploadDemo(){
+        this.uploadProgress.classList.add('active');
+        for(let i=0;i<=100;i+=20){
+            this.progressFill.style.width=i+'%';
+            await new Promise(r=>setTimeout(r,100));
+        }
+        this.uploadProgress.classList.remove('active');
+        this.showStatus("Image uploaded (demo)","success");
+    }
+
+    clearAll(){
+        this.previewContainer.classList.remove('active');
+        cropControls.classList.remove('active');
+        this.uploadBtn.disabled=true;
+        this.showStatus("Cleared","info");
+    }
+
+    showStatus(msg,type){
+        this.statusMessage.textContent=msg;
+        this.statusMessage.className=`status-message ${type} show`;
+        setTimeout(()=>this.statusMessage.classList.remove('show'),3000);
+    }
+}
+
+document.addEventListener('DOMContentLoaded',()=>new PhotoCaptureModule());
+</script>
+
 </body>
 </html>
