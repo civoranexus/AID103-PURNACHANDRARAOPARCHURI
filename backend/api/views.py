@@ -523,22 +523,121 @@ def photo_upload(request):
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def disease_detection(request):
-    """Detect diseases in uploaded images"""
+    """Detect diseases in uploaded images - returns comprehensive farmer-friendly results"""
     if 'image' not in request.FILES:
         return Response({'error': 'No image provided'}, status=status.HTTP_400_BAD_REQUEST)
     
     image_file = request.FILES['image']
     
-    # Mock disease detection results (in production would use ML model)
-    diseases = [
-        {'name': 'Powdery Mildew', 'confidence': 0.92, 'treatment': 'Apply sulfur-based fungicide'},
-        {'name': 'Early Blight', 'confidence': 0.85, 'treatment': 'Remove infected leaves, apply mancozeb'},
-        {'name': 'Leaf Rust', 'confidence': 0.78, 'treatment': 'Use rust-specific fungicides'},
-        {'name': 'Healthy', 'confidence': 0.95, 'treatment': 'Continue regular monitoring'}
+    # Mock disease detection results with comprehensive farmer-friendly data
+    diseases_db = [
+        {
+            'name': 'Powdery Mildew',
+            'confidence': 0.92,
+            'treatment': 'Apply sulfur-based fungicide or neem oil spray once weekly for 2-3 weeks. Ensure good air circulation around plants.',
+            'explanation': 'Powdery mildew is a fungal infection that appears as white powder on leaves. It thrives in warm, dry conditions and spreads quickly if not treated.',
+            'prevention': [
+                'Remove infected leaves and dispose of them properly',
+                'Improve air circulation by spacing plants adequately',
+                'Avoid overhead watering; water at soil level only',
+                'Apply preventive sulfur spray every 10-14 days during high-risk season'
+            ],
+            'affected_area_percent': 15.5,
+            'severity': 'Medium',
+            'healthy': False
+        },
+        {
+            'name': 'Early Blight',
+            'confidence': 0.85,
+            'treatment': 'Remove lower leaves (first 8-12 inches). Apply mancozeb or chlorothalonil fungicide every 7-10 days. Prune dense foliage.',
+            'explanation': 'Early blight causes brown spots with concentric rings on leaves. It starts on lower leaves and moves upward if left untreated. Common in tomatoes and potatoes.',
+            'prevention': [
+                'Remove infected leaves as soon as symptoms appear',
+                'Space plants for maximum air flow',
+                'Mulch soil to prevent soil splash',
+                'Rotate crops annually to different locations'
+            ],
+            'affected_area_percent': 22.8,
+            'severity': 'Medium',
+            'healthy': False
+        },
+        {
+            'name': 'Leaf Rust',
+            'confidence': 0.78,
+            'treatment': 'Apply rust-specific fungicides (sulfur or copper-based). Spray weekly until infection subsides. Remove severely affected leaves.',
+            'explanation': 'Leaf rust appears as reddish-brown or orange pustules on leaf undersides. It weakens plants by reducing photosynthesis capacity.',
+            'prevention': [
+                'Choose rust-resistant crop varieties when available',
+                'Maintain dry foliage by watering early morning at soil level',
+                'Thin crowded growth to improve air circulation',
+                'Remove and destroy heavily infected plant parts'
+            ],
+            'affected_area_percent': 8.3,
+            'severity': 'Low',
+            'healthy': False
+        },
+        {
+            'name': 'Healthy Crop',
+            'confidence': 0.95,
+            'treatment': 'Continue regular monitoring. Maintain good cultural practices: proper spacing, adequate water, and removal of dead leaves.',
+            'explanation': 'No visible disease detected. Plant appears healthy with normal leaf color and structure.',
+            'prevention': [
+                'Continue weekly crop monitoring',
+                'Maintain regular watering and fertilization schedule',
+                'Remove any yellowed or diseased leaves as they appear',
+                'Keep weeds controlled around the crop'
+            ],
+            'affected_area_percent': 0.0,
+            'severity': 'Low',
+            'healthy': True
+        }
     ]
     
     import random
-    detection = random.choice(diseases)
+    import base64
+    import cv2
+    import numpy as np
+    from io import BytesIO
+    from PIL import Image
+    
+    detection = random.choice(diseases_db)
+    
+    # Generate a simple marked image (simulates highlighting affected areas)
+    try:
+        # Read the uploaded image
+        image_bytes = image_file.read()
+        image_array = np.frombuffer(image_bytes, np.uint8)
+        image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+        
+        if image is not None:
+            # Create a marked version with visual highlights (if diseased)
+            marked_image = image.copy()
+            if not detection['healthy'] and detection['affected_area_percent'] > 0:
+                # Simple red highlight overlay on random regions (mock disease spots)
+                h, w = marked_image.shape[:2]
+                num_spots = max(2, int(detection['affected_area_percent'] / 5))
+                for _ in range(num_spots):
+                    cx = random.randint(w // 4, 3 * w // 4)
+                    cy = random.randint(h // 4, 3 * h // 4)
+                    radius = random.randint(20, 60)
+                    cv2.circle(marked_image, (cx, cy), radius, (0, 0, 255), 2)  # Red circles
+                    cv2.circle(marked_image, (cx, cy), radius, (0, 100, 255), -1)  # Red fill with alpha
+                    # Blend the circle with original image
+                    mask = np.zeros(marked_image.shape[:2], dtype=np.uint8)
+                    cv2.circle(mask, (cx, cy), radius, 255, -1)
+                    marked_image = np.where(mask[:, :, None] == 255, 
+                                            cv2.addWeighted(image, 0.5, marked_image, 0.5, 0),
+                                            marked_image)
+            
+            # Encode marked image to base64 data URI
+            _, encoded = cv2.imencode('.jpg', marked_image)
+            marked_image_base64 = base64.b64encode(encoded).decode('utf-8')
+            marked_image_uri = f"data:image/jpeg;base64,{marked_image_base64}"
+        else:
+            marked_image_uri = None
+    except Exception as e:
+        print(f"Error creating marked image: {e}")
+        marked_image_uri = None
     
     # Save detection record to database
     try:
@@ -548,7 +647,7 @@ def disease_detection(request):
             image_path=f'uploads/{image_file.name}',
             disease_name=detection['name'],
             confidence_score=detection['confidence'],
-            severity_level='Medium',
+            severity_level=detection['severity'],
             recommended_action=detection['treatment']
         )
         
@@ -561,10 +660,17 @@ def disease_detection(request):
     except Exception as e:
         print(f'Error saving disease detection: {e}')
     
+    # Return comprehensive farmer-friendly response
     return Response({
         'disease_name': detection['name'],
         'confidence': detection['confidence'],
         'treatment': detection['treatment'],
+        'explanation': detection['explanation'],
+        'prevention': detection['prevention'],
+        'marked_image': marked_image_uri,
+        'affected_area_percent': detection['affected_area_percent'],
+        'severity': detection['severity'],
+        'healthy': detection['healthy'],
         'filename': image_file.name,
         'message': 'Disease detection completed'
     }, status=status.HTTP_200_OK)

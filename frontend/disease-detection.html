@@ -1,462 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disease Detection - CropGuard AI</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Disease Detection – CropGuard AI</title>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #1B9AAA 0%, #16808D 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-
-        .content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-            transform: translateY(-5px);
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .upload-area {
-            border: 2px dashed #1B9AAA;
-            border-radius: 10px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .upload-area:hover {
-            background: #f0fafb;
-            border-color: #16808D;
-        }
-
-        .upload-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-
-        .upload-text {
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .upload-hint {
-            font-size: 12px;
-            color: #999;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        .results {
-            margin-top: 20px;
-        }
-
-        .result-item {
-            padding: 15px;
-            background: #f8f9ff;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid #667eea;
-        }
-
-        .result-disease {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .result-confidence {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .confidence-bar {
-            width: 100%;
-            height: 6px;
-            background: #e0e0e0;
-            border-radius: 3px;
-            margin: 8px 0 5px 0;
-            overflow: hidden;
-        }
-
-        .confidence-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 3px;
-        }
-
-        .treatment {
-            margin-top: 10px;
-            padding: 10px;
-            background: white;
-            border-radius: 6px;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .treatment-title {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .history {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .history-item {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
-            font-size: 13px;
-        }
-
-        .history-date {
-            color: #999;
-            font-size: 11px;
-        }
-
-        .history-disease {
-            color: #333;
-            margin: 3px 0;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .status.healthy {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status.infected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status.warning {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 3px solid rgba(102, 126, 234, 0.3);
-            border-radius: 50%;
-            border-top-color: #667eea;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
-
-            .header h1 {
-                font-size: 22px;
-            }
-        }
-    </style>
+<style>
+body{font-family:Segoe UI,Tahoma,sans-serif;background:#f5f7fa;padding:20px}
+.container{max-width:1000px;margin:auto}
+.header{background:linear-gradient(135deg,#1B9AAA,#16808D);color:#fff;padding:25px;border-radius:14px;margin-bottom:25px}
+.content{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+.upload-area{border:2px dashed #1B9AAA;padding:35px;text-align:center;border-radius:10px;cursor:pointer}
+.upload-area:hover{background:#f0fafb}
+input[type=file]{display:none}
+.result-images{display:flex;gap:12px;flex-wrap:wrap}
+.result-image{width:48%;min-width:180px;text-align:center}
+.result-image img{width:100%;border-radius:8px}
+.status-badge{padding:8px 12px;border-radius:20px;font-weight:700}
+.status-healthy{background:#d4edda;color:#155724}
+.status-infected{background:#f8d7da;color:#721c24}
+.severity-low{background:#e6f4ea;color:#1b7a3a;padding:6px 10px;border-radius:6px}
+.severity-medium{background:#fff6e6;color:#8a5a00;padding:6px 10px;border-radius:6px}
+.severity-high{background:#fdecea;color:#7a1212;padding:6px 10px;border-radius:6px}
+.spinner{width:18px;height:18px;border:3px solid #ccc;border-top:3px solid #1B9AAA;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🦠 Disease Detection & Analysis</h1>
-            <p>Upload crop images for AI-powered disease diagnosis</p>
+<div class="container">
+
+<div class="header">
+<h1>🦠 CropGuard AI – Disease Detection</h1>
+<p>Upload a crop image for AI-powered diagnosis</p>
+</div>
+
+<div class="content">
+
+<div class="card">
+<h3>📸 Upload Image</h3>
+<div class="upload-area" id="uploadArea">
+Click or drag image here
+<input type="file" id="fileInput" accept="image/*">
+</div>
+</div>
+
+<div class="card">
+<h3>🔍 AI Analysis</h3>
+<div id="results">No image analyzed yet</div>
+</div>
+
+</div>
+</div>
+
+<script>
+class CropGuardAI {
+  constructor(){
+    this.init();
+  }
+
+  init(){
+    const uploadArea=document.getElementById("uploadArea");
+    const fileInput=document.getElementById("fileInput");
+    uploadArea.onclick=()=>fileInput.click();
+    fileInput.onchange=e=>{
+      if(e.target.files.length) this.analyze(e.target.files[0]);
+    };
+  }
+
+  analyze(file){
+    const results=document.getElementById("results");
+    results.innerHTML='<div class="spinner"></div> Analyzing...';
+
+    const previewURL=URL.createObjectURL(file);
+    const formData=new FormData();
+    formData.append("image",file);
+
+    fetch("http://localhost:8001/api/disease-detection/",{
+      method:"POST",
+      body:formData
+    })
+    .then(res=>res.json())
+    .then(data=>{
+      const status = data.disease === "Healthy" ? "Healthy" : "Disease Detected";
+      const severity = data.severity_level || "Medium";
+
+      results.innerHTML=`
+      <span class="status-badge ${status==="Healthy"?"status-healthy":"status-infected"}">${status}</span>
+
+      <div class="result-images">
+        <div class="result-image">
+          <small>Uploaded</small>
+          <img src="${previewURL}">
         </div>
-
-        <div class="content">
-            <!-- Upload Section -->
-            <div class="card">
-                <div class="card-title">📸 Upload Image</div>
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📤</div>
-                    <div class="upload-text">Drag images here or click to select</div>
-                    <div class="upload-hint">PNG, JPG, JPEG (max 5MB)</div>
-                    <input type="file" id="fileInput" accept="image/*">
-                </div>
-            </div>
-
-            <!-- Analysis Results -->
-            <div class="card">
-                <div class="card-title">🔍 Analysis Results</div>
-                <div id="results" class="results">
-                    <p style="color: #999; text-align: center;">No image analyzed yet</p>
-                </div>
-            </div>
-
-            <!-- Detection History -->
-            <div class="card">
-                <div class="card-title">📋 Recent Detections</div>
-                <div class="history" id="history">
-                    <div class="history-item">
-                        <div class="history-date">Yesterday, 2:30 PM</div>
-                        <div class="history-disease">Powdery Mildew <span class="status infected">Infected</span></div>
-                    </div>
-                    <div class="history-item">
-                        <div class="history-date">2 days ago</div>
-                        <div class="history-disease">Leaf Spot <span class="status healthy">Healthy</span></div>
-                    </div>
-                    <div class="history-item">
-                        <div class="history-date">1 week ago</div>
-                        <div class="history-disease">Rust <span class="status warning">Warning</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Disease Database -->
-            <div class="card">
-                <div class="card-title">📚 Common Crop Diseases</div>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <div style="padding: 10px; background: #f8f9ff; border-radius: 6px;">
-                        <strong style="color: #333;">Powdery Mildew</strong>
-                        <p style="font-size: 12px; color: #666; margin: 5px 0;">White powder on leaves</p>
-                    </div>
-                    <div style="padding: 10px; background: #f8f9ff; border-radius: 6px;">
-                        <strong style="color: #333;">Early Blight</strong>
-                        <p style="font-size: 12px; color: #666; margin: 5px 0;">Brown spots with concentric rings</p>
-                    </div>
-                    <div style="padding: 10px; background: #f8f9ff; border-radius: 6px;">
-                        <strong style="color: #333;">Leaf Rust</strong>
-                        <p style="font-size: 12px; color: #666; margin: 5px 0;">Reddish-brown pustules</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Treatment Recommendations -->
-            <div class="card">
-                <div class="card-title">💊 Treatment Options</div>
-                <div style="display: flex; flex-direction: column; gap: 15px;">
-                    <div class="treatment">
-                        <div class="treatment-title">Organic Treatment</div>
-                        <p>Use sulfur-based fungicides or neem oil spray. Repeat every 7-10 days.</p>
-                    </div>
-                    <div class="treatment">
-                        <div class="treatment-title">Chemical Treatment</div>
-                        <p>Apply synthetic fungicides. Follow label instructions carefully.</p>
-                    </div>
-                    <div class="treatment">
-                        <div class="treatment-title">Cultural Management</div>
-                        <p>Improve air circulation, reduce humidity, remove infected leaves.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Confidence Stats -->
-            <div class="card">
-                <div class="card-title">📊 Detection Confidence</div>
-                <div style="display: flex; flex-direction: column; gap: 15px;">
-                    <div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="font-size: 13px;">Model Accuracy</span>
-                            <span style="font-weight: 600;">94.5%</span>
-                        </div>
-                        <div class="confidence-bar">
-                            <div class="confidence-fill" style="width: 94.5%;"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="font-size: 13px;">Processed Images</span>
-                            <span style="font-weight: 600;">256</span>
-                        </div>
-                    </div>
-                    <div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="font-size: 13px;">Detection Time</span>
-                            <span style="font-weight: 600;">2.3s avg</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="result-image">
+          <small>AI Marked</small>
+          <img src="${data.marked_image ? "data:image/jpeg;base64,"+data.marked_image : ""}">
         </div>
-    </div>
+      </div>
 
-    <script>
-        class DiseaseDetection {
-            constructor() {
-                this.setupEventListeners();
-                this.mockDiseases = [
-                    { name: 'Powdery Mildew', confidence: 0.92, treatment: 'Apply sulfur-based fungicide' },
-                    { name: 'Early Blight', confidence: 0.85, treatment: 'Remove infected leaves, apply mancozeb' },
-                    { name: 'Leaf Rust', confidence: 0.78, treatment: 'Use rust-specific fungicides' }
-                ];
-            }
+      <p><b>Severity:</b> <span class="severity-${severity.toLowerCase()}">${severity}</span></p>
+      <p><b>Affected Area:</b> ${data.severity_percent?.toFixed(1) || 0}%</p>
+      <p><b>Confidence:</b> ${(data.confidence*100).toFixed(1)}%</p>
 
-            setupEventListeners() {
-                const uploadArea = document.getElementById('uploadArea');
-                const fileInput = document.getElementById('fileInput');
+      <p><b>AI Explanation:</b> AI detected abnormal patterns on the leaf surface.</p>
+      <p><b>Treatment:</b> ${data.treatment}</p>
+      <p><b>Prevention:</b> ${data.prevention}</p>
+      `;
+    })
+    .catch(()=>{
+      results.innerHTML="<p>Backend not reachable. Please try again.</p>";
+    });
+  }
+}
 
-                uploadArea.addEventListener('click', () => fileInput.click());
-                uploadArea.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    uploadArea.style.background = '#f0f4ff';
-                });
-                uploadArea.addEventListener('dragleave', () => {
-                    uploadArea.style.background = '';
-                });
-                uploadArea.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    uploadArea.style.background = '';
-                    if (e.dataTransfer.files.length > 0) {
-                        this.analyzeImage(e.dataTransfer.files[0]);
-                    }
-                });
-
-                fileInput.addEventListener('change', (e) => {
-                    if (e.target.files.length > 0) {
-                        this.analyzeImage(e.target.files[0]);
-                    }
-                });
-            }
-
-            analyzeImage(file) {
-                const resultsDiv = document.getElementById('results');
-                resultsDiv.innerHTML = '<p style="text-align: center;"><div class="spinner"></div> Analyzing image...</p>';
-
-                // Call Django backend API for disease detection
-                const formData = new FormData();
-                formData.append('image', file);
-
-                fetch('http://localhost:8001/api/disease-detection/', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
-                    },
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`API Error: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Use API result or fallback to mock data
-                    const disease = data.disease_name || this.mockDiseases[Math.floor(Math.random() * this.mockDiseases.length)];
-                    const confidence = data.confidence || (disease.confidence || 0.85);
-                    const treatment = data.treatment || disease.treatment;
-
-                    const html = `
-                        <div class="result-item">
-                            <div class="result-disease">${disease.name || disease}</div>
-                            <div class="result-confidence">Confidence: ${(confidence * 100).toFixed(1)}%</div>
-                            <div class="confidence-bar">
-                                <div class="confidence-fill" style="width: ${confidence * 100}%;"></div>
-                            </div>
-                            <div class="treatment">
-                                <div class="treatment-title">Recommended Treatment:</div>
-                                <p>${treatment}</p>
-                            </div>
-                        </div>
-                    `;
-                    resultsDiv.innerHTML = html;
-                })
-                .catch(error => {
-                    console.error('API Error:', error);
-                    // Fallback to mock data if API fails
-                    const randomDisease = this.mockDiseases[Math.floor(Math.random() * this.mockDiseases.length)];
-                    const html = `
-                        <div class="result-item">
-                            <div class="result-disease">${randomDisease.name}</div>
-                            <div class="result-confidence">Confidence: ${(randomDisease.confidence * 100).toFixed(1)}%</div>
-                            <div class="confidence-bar">
-                                <div class="confidence-fill" style="width: ${randomDisease.confidence * 100}%;"></div>
-                            </div>
-                            <div class="treatment">
-                                <div class="treatment-title">Recommended Treatment:</div>
-                                <p>${randomDisease.treatment}</p>
-                            </div>
-                        </div>
-                    `;
-                    resultsDiv.innerHTML = html;
-                });
-            }
-        }
-
-        new DiseaseDetection();
-    </script>
+new CropGuardAI();
+</script>
 </body>
 </html>
