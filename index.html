@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CropGuard AI - Agricultural Intelligence Platform</title>
     <link rel="stylesheet" href="style.css">
-    <script src="language-support.js"></script>
     <style>
         .navbar {
             background: linear-gradient(135deg, #1B9AAA 0%, #156064 100%);
@@ -381,6 +380,19 @@
     <script src="language-support.js"></script>
     <script src="script.js"></script>
     <script>
+        // Auth guard: redirect to login if not authenticated
+        (function() {
+            try {
+                const accessToken = localStorage.getItem('access_token');
+                const isAuthPage = location.pathname.includes('auth.html');
+                if (!accessToken && !isAuthPage) {
+                    window.location.href = 'frontend/auth.html';
+                }
+            } catch (e) {
+                console.warn('Auth check failed', e);
+            }
+        })();
+
         // Initialize language support
         i18n.init();
         
