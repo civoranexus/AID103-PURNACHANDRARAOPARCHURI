@@ -24,7 +24,7 @@ class ConnectionChecker {
         console.log("API BACKEND CONNECTION TEST");
         console.log("=" .repeat(80));
         
-        const backendUrl = 'http://localhost:8000/api';
+        const backendUrl = 'http://localhost:8001/api';
         
         try {
             const response = await fetch(`${backendUrl}/`, {
@@ -68,12 +68,12 @@ class ConnectionChecker {
         console.log("=" .repeat(80));
         
         const endpoints = [
-            { url: 'http://localhost:8000/api/auth/token/', method: 'POST', name: 'Authentication Token' },
-            { url: 'http://localhost:8000/api/users/', method: 'GET', name: 'User Profile' },
-            { url: 'http://localhost:8000/api/farms/', method: 'GET', name: 'Farms List' },
-            { url: 'http://localhost:8000/api/disease-detection/', method: 'GET', name: 'Disease Detection' },
-            { url: 'http://localhost:8000/api/weather/', method: 'GET', name: 'Weather Data' },
-            { url: 'http://localhost:8000/api/alerts/', method: 'GET', name: 'Alerts' },
+            { url: 'http://localhost:8001/api/auth/token/', method: 'POST', name: 'Authentication Token' },
+            { url: 'http://localhost:8001/api/users/', method: 'GET', name: 'User Profile' },
+            { url: 'http://localhost:8001/api/farms/', method: 'GET', name: 'Farms List' },
+            { url: 'http://localhost:8001/api/disease-detection/', method: 'GET', name: 'Disease Detection' },
+            { url: 'http://localhost:8001/api/weather/', method: 'GET', name: 'Weather Data' },
+            { url: 'http://localhost:8001/api/alerts/', method: 'GET', name: 'Alerts' },
         ];
         
         this.results.api.endpoints = {};

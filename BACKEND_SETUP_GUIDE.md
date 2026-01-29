@@ -6,7 +6,7 @@ This guide covers setting up the complete Django REST API backend for CropGuard 
 **Database:** Neon PostgreSQL (Cloud-hosted)
 **Framework:** Django 4.2 + Django REST Framework
 **Authentication:** JWT (JSON Web Tokens)
-**API Base URL:** `http://localhost:8000/api/`
+**API Base URL:** `http://localhost:8001/api/`
 
 ---
 
@@ -176,7 +176,7 @@ mkdir logs
 python manage.py runserver
 
 # Output:
-# Starting development server at http://127.0.0.1:8000/
+# Starting development server at http://127.0.0.1:8001/
 ```
 
 ### Test API Endpoints
@@ -184,18 +184,25 @@ python manage.py runserver
 # In another terminal, test endpoints using curl:
 
 # 1. Get JWT Token
-curl -X POST http://localhost:8000/api/auth/token/ \
+curl -X POST http://localhost:8001/api/auth/token/ \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@cropguard.com","password":"your_password"}'
 
 # Response: {"access":"eyJ0...","refresh":"eyJ0..."}
 
-# 2. Get User Profile (with token)
-curl -X GET http://localhost:8000/api/profile/me/ \
+# 2. Test Disease Detection (sample image)
+# Replace /path/to/image.jpg with a local image path
+curl -X POST http://localhost:8001/api/disease-detection/ -F "image=@/path/to/image.jpg"
+
+# Alternatively, use the included test script:
+# python scripts/test_disease_detection.py /path/to/image.jpg
+
+# 3. Get User Profile (with token)
+curl -X GET http://localhost:8001/api/profile/me/ \
   -H "Authorization: Bearer <ACCESS_TOKEN>"
 
-# 3. Create Farm
-curl -X POST http://localhost:8000/api/farms/ \
+# 4. Create Farm
+curl -X POST http://localhost:8001/api/farms/ \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <ACCESS_TOKEN>" \
   -d '{
@@ -206,7 +213,7 @@ curl -X POST http://localhost:8000/api/farms/ \
   }'
 
 # 4. Get User Alerts
-curl -X GET http://localhost:8000/api/alerts/ \
+curl -X GET http://localhost:8001/api/alerts/ \
   -H "Authorization: Bearer <ACCESS_TOKEN>"
 ```
 
@@ -228,7 +235,7 @@ In `index.html`, include both scripts in order:
 ### Frontend API Base URL
 By default, `api-integration.js` uses:
 ```javascript
-const baseUrl = 'http://localhost:8000/api'
+const baseUrl = 'http://localhost:8001/api'
 ```
 
 To change for production:
