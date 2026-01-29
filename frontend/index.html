@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CropGuard AI | Disease Detection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Basic styling (no external frameworks) -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F4F7FA;
+            color: #071426;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #142C52;
+            color: white;
+            padding: 16px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: #FFFFFF;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        h2, h3 {
+            color: #1B9AAA;
+            margin-top: 0;
+        }
+
+        input[type="file"] {
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #16808D;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background-color: #1B9AAA;
+        }
+
+        img {
+            margin-top: 15px;
+            max-width: 100%;
+            border-radius: 6px;
+            border: 1px solid #D4DBE9;
+        }
+
+        .report p {
+            margin: 6px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #E5E7EB;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>CropGuard AI</h1>
+    <p>AI-Powered Crop Disease Detection System</p>
+</header>
+
+<main>
+
+    <!-- Image Upload -->
+    <div class="card">
+        <h2>Upload Crop Image</h2>
+        <input type="file" id="imageInput" accept="image/*">
+        <br>
+        <button onclick="analyze()">Analyze with AI</button>
+    </div>
+
+    <!-- Marked Image Output -->
+    <div class="card">
+        <h3>AI Detected Affected Area</h3>
+        <img id="resultImage" alt="Marked disease image will appear here">
+    </div>
+
+    <!-- AI Report -->
+    <div class="card report">
+        <h3>AI Analysis Report</h3>
+        <p id="report">Awaiting analysis...</p>
+    </div>
+
+</main>
+
+<footer>
+    © Civora Nexus Pvt. Ltd. | CivoraX Internship Program
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

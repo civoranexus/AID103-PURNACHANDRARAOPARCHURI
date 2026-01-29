@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard AI - Agricultural Intelligence Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="language-support.js"></script>
+    <style>
+        .navbar {
+            background: linear-gradient(135deg, #1B9AAA 0%, #156064 100%);
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .navbar-menu {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .navbar-menu a, .navbar-menu button {
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+        .navbar-menu a:hover, .navbar-menu button:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            min-width: 200px;
+            display: none;
+            z-index: 1001;
+        }
+        .dropdown-menu.active {
+            display: block;
+        }
+        .dropdown-menu a {
+            display: block;
+            color: #333;
+            padding: 12px 20px;
+            background: white;
+            border: none;
+        }
+        .dropdown-menu a:hover {
+            background: #f0f0f0;
+        }
+        .language-selector {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .navbar-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .navbar-menu {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-brand">
+                🌾 CropGuard AI
+            </a>
+            <div class="navbar-menu">
+                <a href="#home" data-translate="dashboard">Dashboard</a>
+                <a href="photo-capture-module.html" data-translate="photo">Photo Capture</a>
+                <a href="disease-detection.html" data-translate="disease">Disease Detection</a>
+                <a href="analytics.html" data-translate="analytics">Analytics</a>
+                <a href="notifications-center.html" data-translate="alerts">Alerts</a>
+                <a href="farm-history.html" data-translate="history">History</a>
+                <a href="help.html" data-translate="help">Help</a>
+                <a href="settings.html" data-translate="settings">Settings</a>
+                <select class="language-selector" id="languageSelector" onchange="changeLanguage(this.value)">
+                    <option value="en">🇬🇧 English</option>
+                    <option value="hi">🇮🇳 हिन्दी</option>
+                    <option value="te">తెలుగు</option>
+                    <option value="ta">தமிழ்</option>
+                    <option value="mr">मराठी</option>
+                    <option value="gu">ગુજરાતી</option>
+                    <option value="bn">বাংলা</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header with Logo -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-section">
+                <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="#1B9AAA" opacity="0.1"/>
+                    <path d="M30 60 Q50 30 70 60" stroke="#1B9AAA" stroke-width="3" fill="none"/>
+                    <circle cx="30" cy="60" r="4" fill="#1B9AAA"/>
+                    <circle cx="70" cy="60" r="4" fill="#1B9AAA"/>
+                    <text x="50" y="85" text-anchor="middle" font-size="10" fill="#1B9AAA" font-weight="bold">CropGuard</text>
+                </svg>
+                <div>
+                    <h1 data-translate="appTitle">CropGuard AI</h1>
+                    <p data-translate="subtitle">Agricultural Intelligence Platform</p>
+                </div>
+            </div>
+            <div class="header-branding">
+                <p>Powered by <strong>Civora Nexus Pvt. Ltd.</strong></p>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Section 1: Farm & Location Details -->
+        <section class="section farm-details">
+            <div class="section-header">
+                <h2>🧑‍🌾 Farm & Location Details</h2>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="farmerName">Farmer Name</label>
+                    <input type="text" id="farmerName" placeholder="Enter your full name" class="input">
+                </div>
+                <div class="form-group">
+                    <label for="cropType">Crop Type</label>
+                    <select id="cropType" class="input">
+                        <option value="">-- Select Crop --</option>
+                        <option value="wheat">Wheat</option>
+                        <option value="rice">Rice</option>
+                        <option value="corn">Corn</option>
+                        <option value="cotton">Cotton</option>
+                        <option value="potato">Potato</option>
+                        <option value="tomato">Tomato</option>
+                        <option value="sugarcane">Sugarcane</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="plantingDate">Planting Date</label>
+                    <input type="date" id="plantingDate" class="input">
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Location Selection Module (Google Earth-like) -->
+        <section class="section location-module">
+            <div class="section-header">
+                <h2>🌍 Select Farm Location</h2>
+            </div>
+            <div class="location-container">
+                <!-- Map Container -->
+                <div class="map-wrapper">
+                    <canvas id="mapCanvas" class="map-canvas"></canvas>
+                    <div class="map-controls">
+                        <button id="zoomIn" class="zoom-btn" title="Zoom In">+</button>
+                        <button id="zoomOut" class="zoom-btn" title="Zoom Out">−</button>
+                        <button id="resetMap" class="reset-btn" title="Reset View">⟲</button>
+                    </div>
+                </div>
+
+                <!-- Location Info Card -->
+                <div class="location-info">
+                    <h3>📍 Selected Farm Location</h3>
+                    <div class="location-details">
+                        <div class="detail-row">
+                            <span class="label">Latitude:</span>
+                            <span id="latValue" class="value">-- Click on map --</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Longitude:</span>
+                            <span id="lonValue" class="value">-- Click on map --</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Area Name:</span>
+                            <span id="areaName" class="value">-- Not selected --</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Accuracy:</span>
+                            <span id="accuracyValue" class="value">-- N/A --</span>
+                        </div>
+                    </div>
+                    <div class="location-buttons">
+                        <button id="fetchLocation" class="btn btn-secondary">📍 Fetch Current Location</button>
+                        <button id="confirmLocation" class="btn btn-primary" disabled>Confirm Farm Location</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Crop Image Input -->
+        <section class="section image-input">
+            <div class="section-header">
+                <h2>📷 Crop Image Input</h2>
+            </div>
+
+            <!-- Toggle Between Upload and URL -->
+            <div class="image-mode-toggle">
+                <button class="toggle-btn active" data-mode="upload">Upload Image</button>
+                <button class="toggle-btn" data-mode="url">Fetch from URL</button>
+            </div>
+
+            <!-- Upload Mode -->
+            <div class="image-mode active" id="upload-mode">
+                <div class="upload-area" id="uploadArea">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 2v20M7 7h10M7 12h10"/>
+                    </svg>
+                    <p>Click or drag image here</p>
+                    <p class="small-text">Supports JPG, PNG (Max 5MB)</p>
+                </div>
+                <input type="file" id="imageUpload" accept="image/*" hidden>
+            </div>
+
+            <!-- URL Mode -->
+            <div class="image-mode" id="url-mode">
+                <div class="form-group">
+                    <label for="imageUrl">Image URL</label>
+                    <input type="text" id="imageUrl" placeholder="https://example.com/crop-image.jpg" class="input">
+                    <button id="fetchImage" class="btn btn-secondary">Fetch & Preview</button>
+                </div>
+            </div>
+
+            <!-- Image Preview -->
+            <div class="image-preview-container">
+                <img id="previewImage" class="preview-image hidden" alt="Crop image preview">
+                <div id="noImagePlaceholder" class="no-image-placeholder">
+                    <p>Image preview will appear here</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Image Detection & Visualization -->
+        <section class="section detection-module">
+            <div class="section-header">
+                <h2>🧠 Image Detection & Visualization</h2>
+            </div>
+            <button id="analyzeBtn" class="btn btn-primary" disabled>Analyze with AI</button>
+
+            <!-- Canvas for Disease Detection Visualization -->
+            <div class="visualization-container hidden" id="visualizationContainer">
+                <canvas id="detectionCanvas" class="detection-canvas"></canvas>
+                <div class="detection-legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #EF4444;"></span>
+                        <span>High Severity</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #FF8C00;"></span>
+                        <span>Medium Severity</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #22C55E;"></span>
+                        <span>Low Severity</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: AI Analysis Report -->
+        <section class="section ai-report hidden" id="aiReportSection">
+            <div class="section-header">
+                <h2>📊 AI Analysis Report</h2>
+            </div>
+            <div class="report-grid">
+                <div class="report-card">
+                    <h4>Disease Detected</h4>
+                    <p id="diseaseDetected" class="report-value">--</p>
+                </div>
+                <div class="report-card">
+                    <h4>Severity Level</h4>
+                    <p id="severityLevel" class="report-value">--</p>
+                </div>
+                <div class="report-card">
+                    <h4>AI Confidence</h4>
+                    <p id="confidence" class="report-value">--</p>
+                </div>
+                <div class="report-card">
+                    <h4>Possible Cause</h4>
+                    <p id="possibleCause" class="report-value">--</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Treatment & Recommendations -->
+        <section class="section recommendations hidden" id="recommendationsSection">
+            <div class="section-header">
+                <h2>🌿 Treatment & Recommendations</h2>
+            </div>
+            <div class="recommendations-grid">
+                <div class="recommendation-card">
+                    <h4>💊 Chemical Treatment</h4>
+                    <p id="chemicalTreatment">--</p>
+                </div>
+                <div class="recommendation-card">
+                    <h4>🍃 Organic Alternatives</h4>
+                    <p id="organicAlternatives">--</p>
+                </div>
+                <div class="recommendation-card">
+                    <h4>🛡️ Preventive Practices</h4>
+                    <p id="preventivePractices">--</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Alerts Module -->
+        <section class="section alerts hidden" id="alertsSection">
+            <div class="section-header">
+                <h2>🚨 Priority Alerts</h2>
+            </div>
+            <div id="alertsContainer" class="alerts-container">
+                <!-- Alerts will be dynamically inserted here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-branding">
+                <svg class="footer-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="#1B9AAA" opacity="0.15"/>
+                    <path d="M30 60 Q50 30 70 60" stroke="#1B9AAA" stroke-width="2" fill="none"/>
+                    <circle cx="30" cy="60" r="3" fill="#1B9AAA"/>
+                    <circle cx="70" cy="60" r="3" fill="#1B9AAA"/>
+                </svg>
+                <div>
+                    <p><strong data-translate="appTitle">CropGuard AI</strong></p>
+                    <p data-translate="subtitle">Agricultural Intelligence Platform</p>
+                </div>
+            </div>
+            <div class="footer-links">
+                <a href="help.html" data-translate="help">Help & Support</a>
+                <a href="#privacy" data-translate="privacy">Privacy Policy</a>
+                <a href="#terms" data-translate="terms">Terms of Service</a>
+                <a href="export-reports.html" data-translate="reports">Export Reports</a>
+            </div>
+            <p class="footer-text">© 2026 Civora Nexus Pvt. Ltd. All rights reserved. | v2.0</p>
+        </div>
+    </footer>
+
+    <script src="language-support.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Initialize language support
+        i18n.init();
+        
+        // Set initial language from localStorage or default to English
+        const savedLang = localStorage.getItem('cropguard-language') || 'en';
+        document.getElementById('languageSelector').value = savedLang;
+        i18n.setLanguage(savedLang);
+        
+        // Language selector change handler
+        function changeLanguage(langCode) {
+            i18n.setLanguage(langCode);
+            localStorage.setItem('cropguard-language', langCode);
+        }
+        
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+        });
+    </script>
+</body>
+</html>

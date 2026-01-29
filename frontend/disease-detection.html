@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Disease Detection – CropGuard AI</title>
+
+<style>
+body{font-family:Segoe UI,Tahoma,sans-serif;background:#f5f7fa;padding:20px}
+.container{max-width:1000px;margin:auto}
+.header{background:linear-gradient(135deg,#1B9AAA,#16808D);color:#fff;padding:25px;border-radius:14px;margin-bottom:25px}
+.content{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+.upload-area{border:2px dashed #1B9AAA;padding:35px;text-align:center;border-radius:10px;cursor:pointer}
+.upload-area:hover{background:#f0fafb}
+input[type=file]{display:none}
+.result-images{display:flex;gap:12px;flex-wrap:wrap}
+.result-image{width:48%;min-width:180px;text-align:center}
+.result-image img{width:100%;border-radius:8px}
+.status-badge{padding:8px 12px;border-radius:20px;font-weight:700}
+.status-healthy{background:#d4edda;color:#155724}
+.status-infected{background:#f8d7da;color:#721c24}
+.severity-low{background:#e6f4ea;color:#1b7a3a;padding:6px 10px;border-radius:6px}
+.severity-medium{background:#fff6e6;color:#8a5a00;padding:6px 10px;border-radius:6px}
+.severity-high{background:#fdecea;color:#7a1212;padding:6px 10px;border-radius:6px}
+.spinner{width:18px;height:18px;border:3px solid #ccc;border-top:3px solid #1B9AAA;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="header">
+<h1>🦠 CropGuard AI – Disease Detection</h1>
+<p>Upload a crop image for AI-powered diagnosis</p>
+</div>
+
+<div class="content">
+
+<div class="card">
+<h3>📸 Upload Image</h3>
+<div class="upload-area" id="uploadArea">
+Click or drag image here
+<input type="file" id="fileInput" accept="image/*">
+</div>
+</div>
+
+<div class="card">
+<h3>🔍 AI Analysis</h3>
+<div id="results">No image analyzed yet</div>
+</div>
+
+</div>
+</div>
+
+<script>
+class CropGuardAI {
+  constructor(){
+    this.init();
+  }
+
+  init(){
+    const uploadArea=document.getElementById("uploadArea");
+    const fileInput=document.getElementById("fileInput");
+    uploadArea.onclick=()=>fileInput.click();
+    fileInput.onchange=e=>{
+      if(e.target.files.length) this.analyze(e.target.files[0]);
+    };
+  }
+
+  analyze(file){
+    const results=document.getElementById("results");
+    results.innerHTML='<div class="spinner"></div> Analyzing...';
+
+    const previewURL=URL.createObjectURL(file);
+    const formData=new FormData();
+    formData.append("image",file);
+
+    fetch("http://localhost:8001/api/disease-detection/",{
+      method:"POST",
+      body:formData
+    })
+    .then(res=>res.json())
+    .then(data=>{
+      const status = data.disease === "Healthy" ? "Healthy" : "Disease Detected";
+      const severity = data.severity_level || "Medium";
+
+      results.innerHTML=`
+      <span class="status-badge ${status==="Healthy"?"status-healthy":"status-infected"}">${status}</span>
+
+      <div class="result-images">
+        <div class="result-image">
+          <small>Uploaded</small>
+          <img src="${previewURL}">
+        </div>
+        <div class="result-image">
+          <small>AI Marked</small>
+          <img src="${data.marked_image ? "data:image/jpeg;base64,"+data.marked_image : ""}">
+        </div>
+      </div>
+
+      <p><b>Severity:</b> <span class="severity-${severity.toLowerCase()}">${severity}</span></p>
+      <p><b>Affected Area:</b> ${data.severity_percent?.toFixed(1) || 0}%</p>
+      <p><b>Confidence:</b> ${(data.confidence*100).toFixed(1)}%</p>
+
+      <p><b>AI Explanation:</b> AI detected abnormal patterns on the leaf surface.</p>
+      <p><b>Treatment:</b> ${data.treatment}</p>
+      <p><b>Prevention:</b> ${data.prevention}</p>
+      `;
+    })
+    .catch(()=>{
+      results.innerHTML="<p>Backend not reachable. Please try again.</p>";
+    });
+  }
+}
+
+new CropGuardAI();
+</script>
+</body>
+</html>

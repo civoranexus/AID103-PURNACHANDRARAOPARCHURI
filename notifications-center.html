@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - CropGuard AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            font-size: 2.5em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-header {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-header:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        /* Main Content */
+        .content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 600px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #f8f9fa;
+            border-right: 2px solid #e9ecef;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .filter-section {
+            margin-bottom: 30px;
+        }
+
+        .filter-section h3 {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .filter-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95em;
+        }
+
+        .filter-item:hover {
+            background: #e9ecef;
+        }
+
+        .filter-item.active {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .filter-badge {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .filter-item.active .filter-badge {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        /* Main Notifications Area */
+        .notifications-area {
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .sort-select {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        /* Notifications List */
+        .notifications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .notification-card {
+            padding: 20px;
+            border-left: 5px solid #667eea;
+            border-radius: 8px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: start;
+        }
+
+        .notification-card:hover {
+            background: white;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .notification-card.unread {
+            background: #f0f4ff;
+            border-left-color: #667eea;
+            font-weight: 500;
+        }
+
+        .notification-card.success {
+            border-left-color: #10b981;
+        }
+
+        .notification-card.warning {
+            border-left-color: #f59e0b;
+        }
+
+        .notification-card.danger {
+            border-left-color: #ef4444;
+        }
+
+        .notification-card.info {
+            border-left-color: #3b82f6;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .notification-icon {
+            font-size: 1.5em;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .notification-title {
+            font-weight: 700;
+            font-size: 1em;
+            color: #1f2937;
+            flex: 1;
+        }
+
+        .notification-type {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .notification-card.success .notification-type {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .notification-card.warning .notification-type {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .notification-card.danger .notification-type {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .notification-card.info .notification-type {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .notification-message {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .notification-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            color: #764ba2;
+            transform: scale(1.2);
+        }
+
+        .unread-badge {
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .pagination button {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            background: white;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .pagination button:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-right: none;
+                border-bottom: 2px solid #e9ecef;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .filter-item {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <span class="header-icon">🔔</span>
+                Notifications Center
+            </h1>
+            <div class="header-actions">
+                <button class="btn-header" onclick="markAllAsRead()">Mark All Read</button>
+                <button class="btn-header" onclick="clearAllNotifications()">Clear All</button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Sidebar Filters -->
+            <div class="sidebar">
+                <div class="filter-section">
+                    <h3>📁 Filter</h3>
+                    <div class="filter-item active" onclick="filterNotifications('all')">
+                        <span>All Notifications</span>
+                        <span class="filter-badge">24</span>
+                    </div>
+                    <div class="filter-item" onclick="filterNotifications('unread')">
+                        <span>Unread</span>
+                        <span class="filter-badge">8</span>
+                    </div>
+                    <div class="filter-item" onclick="filterNotifications('alerts')">
+                        <span>Alerts</span>
+                        <span class="filter-badge">5</span>
+                    </div>
+                    <div class="filter-item" onclick="filterNotifications('success')">
+                        <span>Success</span>
+                        <span class="filter-badge">7</span>
+                    </div>
+                    <div class="filter-item" onclick="filterNotifications('warnings')">
+                        <span>Warnings</span>
+                        <span class="filter-badge">4</span>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h3>🏢 Farm</h3>
+                    <div class="filter-item" onclick="filterByFarm('farm-1')">
+                        North Field Farm
+                    </div>
+                    <div class="filter-item" onclick="filterByFarm('farm-2')">
+                        South Orchard
+                    </div>
+                    <div class="filter-item" onclick="filterByFarm('farm-3')">
+                        East Vineyard
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h3>📅 Period</h3>
+                    <div class="filter-item" onclick="filterByPeriod('today')">
+                        Today
+                    </div>
+                    <div class="filter-item" onclick="filterByPeriod('week')">
+                        This Week
+                    </div>
+                    <div class="filter-item" onclick="filterByPeriod('month')">
+                        This Month
+                    </div>
+                    <div class="filter-item" onclick="filterByPeriod('all')">
+                        All Time
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Area -->
+            <div class="notifications-area">
+                <!-- Search and Sort -->
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search notifications..."
+                        onkeyup="searchNotifications(this.value)"
+                    >
+                    <select class="sort-select" onchange="sortNotifications(this.value)">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="unread">Unread First</option>
+                    </select>
+                </div>
+
+                <!-- Notifications List -->
+                <div class="notifications-list" id="notificationsList">
+                    <!-- Disease Alert -->
+                    <div class="notification-card danger unread">
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <span class="notification-icon">🦠</span>
+                                <span class="notification-title">Disease Alert: Early Blight Detected</span>
+                                <span class="notification-type">Alert</span>
+                            </div>
+                            <div class="notification-message">
+                                Early Blight disease detected in North Field Farm (89% confidence). Immediate action recommended. Check disease detection for treatment options.
+                            </div>
+                            <div class="notification-meta">
+                                <span>📍 North Field Farm</span>
+                                <span>🕐 2 hours ago</span>
+                                <span>⚠️ High Priority</span>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <div class="unread-badge"></div>
+                            <button class="action-btn" onclick="markAsRead(event)" title="Mark as read">✓</button>
+                            <button class="action-btn" onclick="deleteNotification(event)" title="Delete">✕</button>
+                        </div>
+                    </div>
+
+                    <!-- Weather Alert -->
+                    <div class="notification-card warning unread">
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <span class="notification-icon">⛈️</span>
+                                <span class="notification-title">Weather Warning: Heavy Rain Forecast</span>
+                                <span class="notification-type">Warning</span>
+                            </div>
+                            <div class="notification-message">
+                                Heavy rainfall (60-80mm) expected in next 12 hours. Consider adjusting irrigation schedule. Strong winds up to 45 km/h.
+                            </div>
+                            <div class="notification-meta">
+                                <span>📍 South Orchard</span>
+                                <span>🕐 3 hours ago</span>
+                                <span>⚠️ Medium Priority</span>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <div class="unread-badge"></div>
+                            <button class="action-btn" onclick="markAsRead(event)" title="Mark as read">✓</button>
+                            <button class="action-btn" onclick="deleteNotification(event)" title="Delete">✕</button>
+                        </div>
+                    </div>
+
+                    <!-- Irrigation Success -->
+                    <div class="notification-card success">
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <span class="notification-icon">💧</span>
+                                <span class="notification-title">Irrigation Schedule Completed</span>
+                                <span class="notification-type">Success</span>
+                            </div>
+                            <div class="notification-message">
+                                Morning irrigation schedule completed successfully. 2,000 gallons dispensed. Soil moisture now at optimal level (65%).
+                            </div>
+                            <div class="notification-meta">
+                                <span>📍 East Vineyard</span>
+                                <span>🕐 6 hours ago</span>
+                                <span>ℹ️ Info</span>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn" onclick="markAsRead(event)" title="Mark as read">✓</button>
+                            <button class="action-btn" onclick="deleteNotification(event)" title="Delete">✕</button>
+                        </div>
+                    </div>
+
+                    <!-- Pest Detection -->
+                    <div class="notification-card danger unread">
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <span class="notification-icon">🐛</span>
+                                <span class="notification-title">Pest Alert: Aphids Detected</span>
+                                <span class="notification-type">Alert</span>
+                            </div>
+                            <div class="notification-message">
+                                Aphid infestation detected with MEDIUM intensity. Affects 25% of crop. Check pest management for control recommendations.
+                            </div>
+                            <div class="notification-meta">
+                                <span>📍 North Field Farm</span>
+                                <span>🕐 8 hours ago</span>
+                                <span>⚠️ High Priority</span>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <div class="unread-badge"></div>
+                            <button class="action-btn" onclick="markAsRead(event)" title="Mark as read">✓</button>
+                            <button class="action-btn" onclick="deleteNotification(event)" title="Delete">✕</button>
+                        </div>
+                    </div>
+
+                    <!-- Market Price -->
+                    <div class="notification-card info">
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <span class="notification-icon">📈</span>
+                                <span class="notification-title">Market Price Update: Wheat</span>
+                                <span class="notification-type">Market</span>
+                            </div>
+                            <div class="notification-message">
+                                Wheat prices increased by 3.5% (₹2,450 → ₹2,536). Good time to sell if harvest ready. Check market analysis for best timing.
+                            </div>
+                            <div class="notification-meta">
+                                <span>💰 Market Update</span>
+                                <span>🕐 12 hours ago</span>
+                                <span>ℹ️ Info</span>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn" onclick="markAsRead(event)" title="Mark as read">✓</button>
+                            <button class="action-btn" onclick="deleteNotification(event)" title="Delete">✕</button>
+                        </div>
+                    </div>
+
+                    <!-- Soil Test -->
+                    <div class="notification-card success">
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <span class="notification-icon">🧪</span>
+                                <span class="notification-title">Soil Test Results Available</span>
+                                <span class="notification-type">Success</span>
+                            </div>
+                            <div class="notification-message">
+                                Soil test results for North Field: pH 6.8 (good), Nitrogen 240 ppm (optimal), Potassium 180 ppm (acceptable). No fertilizer needed soon.
+                            </div>
+                            <div class="notification-meta">
+                                <span>📍 North Field Farm</span>
+                                <span>🕐 1 day ago</span>
+                                <span>ℹ️ Info</span>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn" onclick="markAsRead(event)" title="Mark as read">✓</button>
+                            <button class="action-btn" onclick="deleteNotification(event)" title="Delete">✕</button>
+                        </div>
+                    </div>
+
+                    <!-- Health Score -->
+                    <div class="notification-card success">
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <span class="notification-icon">❤️</span>
+                                <span class="notification-title">Crop Health Score Improved</span>
+                                <span class="notification-type">Success</span>
+                            </div>
+                            <div class="notification-message">
+                                South Orchard crop health improved to 87% (was 82%). Effective pest management and regular monitoring showing positive results.
+                            </div>
+                            <div class="notification-meta">
+                                <span>📍 South Orchard</span>
+                                <span>🕐 2 days ago</span>
+                                <span>ℹ️ Info</span>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn" onclick="markAsRead(event)" title="Mark as read">✓</button>
+                            <button class="action-btn" onclick="deleteNotification(event)" title="Delete">✕</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="active">1</button>
+                    <button>2</button>
+                    <button>3</button>
+                    <button>→</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class NotificationCenter {
+            constructor() {
+                this.notifications = [];
+                this.currentFilter = 'all';
+                this.init();
+            }
+
+            init() {
+                // Load notifications from localStorage
+                const saved = localStorage.getItem('cropguard-notifications');
+                if (saved) {
+                    this.notifications = JSON.parse(saved);
+                }
+                this.render();
+            }
+
+            markAsRead(card) {
+                card.classList.remove('unread');
+                const badge = card.querySelector('.unread-badge');
+                if (badge) badge.remove();
+                this.saveNotifications();
+            }
+
+            deleteNotification(card) {
+                card.remove();
+                this.saveNotifications();
+            }
+
+            markAllAsRead() {
+                document.querySelectorAll('.notification-card.unread').forEach(card => {
+                    this.markAsRead(card);
+                });
+                alert('All notifications marked as read');
+            }
+
+            clearAllNotifications() {
+                if (confirm('Clear all notifications?')) {
+                    document.getElementById('notificationsList').innerHTML = 
+                        '<div class="empty-state"><div class="empty-icon">📭</div><h2>No Notifications</h2><p>You\'re all caught up!</p></div>';
+                    this.saveNotifications();
+                }
+            }
+
+            filterNotifications(type) {
+                this.currentFilter = type;
+                document.querySelectorAll('.filter-item').forEach(item => item.classList.remove('active'));
+                event.target.closest('.filter-item').classList.add('active');
+                // Implement filter logic
+            }
+
+            filterByFarm(farmId) {
+                console.log('Filter by farm:', farmId);
+            }
+
+            filterByPeriod(period) {
+                console.log('Filter by period:', period);
+            }
+
+            searchNotifications(query) {
+                const cards = document.querySelectorAll('.notification-card');
+                cards.forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    card.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
+                });
+            }
+
+            sortNotifications(order) {
+                const list = document.getElementById('notificationsList');
+                const cards = Array.from(list.querySelectorAll('.notification-card'));
+                
+                if (order === 'newest') cards.reverse();
+                else if (order === 'unread') {
+                    cards.sort((a, b) => (b.classList.contains('unread') ? 1 : 0) - (a.classList.contains('unread') ? 1 : 0));
+                }
+                
+                cards.forEach(card => list.appendChild(card));
+            }
+
+            saveNotifications() {
+                localStorage.setItem('cropguard-notifications', JSON.stringify(this.notifications));
+            }
+
+            render() {
+                // Re-render notifications list
+            }
+        }
+
+        // Initialize
+        const notificationCenter = new NotificationCenter();
+
+        // Global functions
+        function markAsRead(event) {
+            event.stopPropagation();
+            const card = event.target.closest('.notification-card');
+            notificationCenter.markAsRead(card);
+        }
+
+        function deleteNotification(event) {
+            event.stopPropagation();
+            const card = event.target.closest('.notification-card');
+            notificationCenter.deleteNotification(card);
+        }
+
+        function markAllAsRead() {
+            notificationCenter.markAllAsRead();
+        }
+
+        function clearAllNotifications() {
+            notificationCenter.clearAllNotifications();
+        }
+
+        function filterNotifications(type) {
+            notificationCenter.filterNotifications(type);
+        }
+
+        function filterByFarm(farmId) {
+            notificationCenter.filterByFarm(farmId);
+        }
+
+        function filterByPeriod(period) {
+            notificationCenter.filterByPeriod(period);
+        }
+
+        function searchNotifications(query) {
+            notificationCenter.searchNotifications(query);
+        }
+
+        function sortNotifications(order) {
+            notificationCenter.sortNotifications(order);
+        }
+    </script>
+</body>
+</html>
