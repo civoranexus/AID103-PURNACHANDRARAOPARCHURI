@@ -68,12 +68,29 @@ WSGI_APPLICATION = 'cropguard_backend.wsgi.application'
 # ============================================
 # DATABASE CONFIGURATION - SQLite (Local Development)
 # ============================================
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+import json
+
+# Check if DATABASE_URL environment variable is set (for cloud deployment)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # Parse PostgreSQL connection string
+    # Format: postgres://user:password@host:port/database
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600
+        )
     }
-}
+else:
+    # Default to SQLite for local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -137,11 +154,28 @@ SIMPLE_JWT = {
 # CORS CONFIGURATION
 # ============================================
 CORS_ALLOWED_ORIGINS = [
+    # Local development
     'http://localhost:3000',
     'http://localhost:8000',
+    'http://localhost:5000',
     'http://127.0.0.1:3000',
     'http://127.0.0.1:8000',
+    'http://127.0.0.1:5000',
+    'http://0.0.0.0:8000',
+    
+    # File protocol for local testing
+    'file://',
+    
+    # Add production domains here when deploying
+    # 'https://yourdomain.com',
+    # 'https://www.yourdomain.com',
 ]
+
+# Allow CORS from any origin in development (be more restrictive in production)
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -155,6 +189,21 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'x-access-token',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_EXPOSE_HEADERS = [
+    'content-type',
+    'x-csrftoken',
 ]
 
 # ============================================

@@ -114,6 +114,13 @@
     © Civora Nexus Pvt. Ltd. | CivoraX Internship Program
 </footer>
 
+<script src="api-config.js"></script>
+<script src="connection-verifier.js"></script>
 <script src="script.js"></script>
+<script>
+    // Initialize verifier on page load
+    window.verifier = new ConnectionVerifier();
+    console.log('✓ ConnectionVerifier loaded. Type verifier.runAll() in console to test connections');
+</script>
 </body>
 </html>
