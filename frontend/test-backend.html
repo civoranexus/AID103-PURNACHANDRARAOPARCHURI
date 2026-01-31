@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #1B9AAA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #16808D;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 CropGuard AI - Backend Connection Test</h1>
+    
+    <div class="test-card">
+        <h2>Test 1: Server Connection</h2>
+        <button onclick="testConnection()">Test Connection</button>
+        <div id="connectionResult"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>Test 2: Register New User</h2>
+        <button onclick="testRegister()">Test Registration</button>
+        <div id="registerResult"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>Test 3: Login</h2>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="loginResult"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>Instructions</h2>
+        <ol>
+            <li>Make sure backend server is running: <code>cd backend && python manage.py runserver 8001</code></li>
+            <li>Click each test button in order</li>
+            <li>Check the results below each button</li>
+        </ol>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001/api';
+
+        async function testConnection() {
+            const resultDiv = document.getElementById('connectionResult');
+            resultDiv.innerHTML = '<div class="result info">Testing connection...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/`, {
+                    method: 'GET'
+                });
+                
+                resultDiv.innerHTML = `
+                    <div class="result ${response.ok ? 'success' : 'info'}">
+                        Status: ${response.status}
+                        Message: Server is reachable!
+                        URL: ${API_BASE}
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        Error: ${error.message}
+                        
+                        Possible issues:
+                        1. Backend server is not running
+                        2. Backend is running on different port
+                        3. CORS is blocking the request
+                        
+                        Solution: Run "python manage.py runserver 8001" in backend folder
+                    </div>
+                `;
+            }
+        }
+
+        async function testRegister() {
+            const resultDiv = document.getElementById('registerResult');
+            resultDiv.innerHTML = '<div class="result info">Testing registration...</div>';
+
+            const testUser = {
+                first_name: 'Test',
+                last_name: 'User',
+                username: `testuser${Date.now()}@test.com`,
+                email: `testuser${Date.now()}@test.com`,
+                password: 'testpass123',
+                password2: 'testpass123',
+                phone: '1234567890',
+                state: 'AP'
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/register/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testUser)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            ✅ Registration successful!
+                            
+                            Response:
+                            ${JSON.stringify(data, null, 2)}
+                            
+                            User created: ${testUser.email}
+                            Password: testpass123
+                            
+                            Now you can test login!
+                        </div>
+                    `;
+                    // Store email for login test
+                    localStorage.setItem('testEmail', testUser.email);
+                    localStorage.setItem('testPassword', 'testpass123');
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            ❌ Registration failed
+                            Status: ${response.status}
+                            
+                            Response:
+                            ${JSON.stringify(data, null, 2)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        ❌ Error: ${error.message}
+                        
+                        Make sure backend server is running!
+                    </div>
+                `;
+            }
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = '<div class="result info">Testing login...</div>';
+
+            const email = localStorage.getItem('testEmail') || 'testuser@test.com';
+            const password = localStorage.getItem('testPassword') || 'testpass123';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/token/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            ✅ Login successful!
+                            
+                            Access Token: ${data.access?.substring(0, 50)}...
+                            Refresh Token: ${data.refresh?.substring(0, 50)}...
+                            
+                            User: ${JSON.stringify(data.user || 'No user data', null, 2)}
+                            
+                            Credentials used:
+                            Email: ${email}
+                            Password: ${password}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            ❌ Login failed
+                            Status: ${response.status}
+                            
+                            Response:
+                            ${JSON.stringify(data, null, 2)}
+                            
+                            Tried credentials:
+                            Email: ${email}
+                            Password: ${password}
+                            
+                            ${email === 'testuser@test.com' ? 'Note: Please run Test 2 first to create a user!' : ''}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        ❌ Error: ${error.message}
+                        
+                        Make sure backend server is running!
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-test connection on load
+        window.addEventListener('load', () => {
+            testConnection();
+        });
+    </script>
+</body>
+</html>

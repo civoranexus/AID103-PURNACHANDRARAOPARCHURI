@@ -56,6 +56,17 @@ class RegisterView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# Health Check View (No Auth Required)
+class HealthCheckView(APIView):
+    permission_classes = [permissions.AllowAny]
+    
+    def get(self, request):
+        return Response({
+            'status': 'ok',
+            'message': 'CropGuard AI Backend is running',
+            'version': '2.0'
+        }, status=status.HTTP_200_OK)
+
 router = DefaultRouter()
 router.register(r'profile', views.UserProfileViewSet, basename='profile')
 router.register(r'farms', views.FarmViewSet, basename='farm')
@@ -69,6 +80,9 @@ router.register(r'irrigation', views.IrrigationScheduleViewSet, basename='irriga
 router.register(r'activity-logs', views.ActivityLogViewSet, basename='activity-log')
 
 urlpatterns = [
+    # Health Check
+    path('', HealthCheckView.as_view(), name='health_check'),
+    
     # Authentication
     path('auth/token/', EmailTokenObtainView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

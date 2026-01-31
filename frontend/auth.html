@@ -40,6 +40,47 @@
             opacity: 0.8;
         }
 
+        .connection-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .connection-status.checking {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .connection-status.online {
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+        }
+
+        .connection-status.offline {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+        }
+
+        .connection-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         .auth-container {
             width: 100%;
             max-width: 450px;
@@ -373,6 +414,12 @@
     </style>
 </head>
 <body>
+    <!-- Connection Status Indicator -->
+    <div class="connection-status checking" id="connectionStatus">
+        <div class="dot"></div>
+        <span>Checking connection...</span>
+    </div>
+
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
@@ -537,6 +584,30 @@
             constructor() {
                 this.apiBase = 'http://localhost:8001/api';
                 this.setupEventListeners();
+                this.checkConnection();
+            }
+
+            async checkConnection() {
+                const statusEl = document.getElementById('connectionStatus');
+                try {
+                    const response = await fetch(`${this.apiBase}/`, { 
+                        method: 'GET',
+                        signal: AbortSignal.timeout(5000)
+                    });
+                    
+                    if (response.ok || response.status === 404) {
+                        // 404 is OK - means server is running but endpoint not found
+                        statusEl.className = 'connection-status online';
+                        statusEl.innerHTML = '<div class="dot"></div><span>Server Online</span>';
+                    } else {
+                        statusEl.className = 'connection-status offline';
+                        statusEl.innerHTML = '<div class="dot"></div><span>Server Error</span>';
+                    }
+                } catch (error) {
+                    statusEl.className = 'connection-status offline';
+                    statusEl.innerHTML = '<div class="dot"></div><span>Server Offline - Start backend server</span>';
+                    console.error('Connection check failed:', error);
+                }
             }
 
             setupEventListeners() {
@@ -610,11 +681,16 @@
                 }
 
                 try {
-                    console.log('Logging in with:', {email: email, password: '***'});
+                    console.log('Attempting login...');
+                    console.log('API URL:', `${this.apiBase}/auth/token/`);
+                    
                     const response = await fetch(`${this.apiBase}/auth/token/`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: email, password })
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ email: email, password: password })
                     });
 
                     console.log('Login response status:', response.status);
@@ -624,22 +700,22 @@
                         console.log('Login successful, storing tokens');
                         localStorage.setItem('access_token', data.access);
                         localStorage.setItem('refresh_token', data.refresh);
-                        localStorage.setItem('user', JSON.stringify({username: email, id: 1}));
+                        localStorage.setItem('user', JSON.stringify(data.user || {username: email, email: email}));
                         
                         if (document.getElementById('rememberMe')?.checked) {
                             localStorage.setItem('rememberEmail', email);
                         }
 
                         this.showMessage('success', 'Login successful! Redirecting...');
-                        setTimeout(() => window.location.href = '/index.html', 1500);
+                        setTimeout(() => window.location.href = 'index.html', 1500);
                     } else {
-                        const errorData = await response.json();
+                        const errorData = await response.json().catch(() => ({}));
                         console.log('Login error:', errorData);
-                        this.showMessage('error', errorData.detail || JSON.stringify(errorData) || 'Invalid email or password');
+                        this.showMessage('error', errorData.detail || 'Invalid email or password. Please try again.');
                     }
                 } catch (error) {
                     console.error('Login exception:', error);
-                    this.showMessage('error', 'Login failed: ' + error.message);
+                    this.showMessage('error', 'Cannot connect to server. Please ensure backend is running at http://localhost:8001');
                 }
             }
 
@@ -650,17 +726,32 @@
                 const phone = document.getElementById('phone').value;
                 const state = document.getElementById('state').value;
                 const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
                 const termsAccept = document.getElementById('termsAccept').checked;
 
+                // Validation
                 if (!firstName || !lastName || !state) {
-                    this.showMessage('error', 'Please fill all required fields');
+                    this.showMessage('error', 'Please fill all required fields (First Name, Last Name, State)');
                     return;
                 }
 
-                if (!this.validateEmail(email, 'registerEmailError') ||
-                    !this.validatePassword(password, 'registerPasswordError') ||
-                    !this.validateConfirmPassword() ||
-                    !this.validatePhone(phone, 'phoneError')) {
+                if (!this.validateEmail(email, 'registerEmailError')) {
+                    this.showMessage('error', 'Please enter a valid email address');
+                    return;
+                }
+
+                if (!this.validatePassword(password, 'registerPasswordError')) {
+                    this.showMessage('error', 'Password must be at least 8 characters');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    this.showMessage('error', 'Passwords do not match');
+                    return;
+                }
+
+                if (!this.validatePhone(phone, 'phoneError')) {
+                    this.showMessage('error', 'Please enter a valid phone number');
                     return;
                 }
 
@@ -670,10 +761,15 @@
                 }
 
                 try {
-                    console.log('Registering user:', {email, firstName, lastName});
+                    console.log('Attempting registration...');
+                    console.log('API URL:', `${this.apiBase}/auth/register/`);
+                    
                     const response = await fetch(`${this.apiBase}/auth/register/`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
                         body: JSON.stringify({
                             first_name: firstName,
                             last_name: lastName,
@@ -681,8 +777,8 @@
                             email: email,
                             password: password,
                             password2: password,
-                            phone,
-                            state
+                            phone: phone,
+                            state: state
                         })
                     });
 
@@ -691,20 +787,37 @@
                     if (response.ok) {
                         const data = await response.json();
                         console.log('Registration successful:', data);
-                        this.showMessage('success', 'Registration successful! Please login.');
+                        this.showMessage('success', 'Registration successful! Please login with your credentials.');
+                        
+                        // Pre-fill email in login form
+                        document.getElementById('loginEmail').value = email;
+                        
+                        // Switch to login form after 2 seconds
                         setTimeout(() => showForm('loginForm'), 2000);
                     } else {
-                        const errorData = await response.json();
+                        const errorData = await response.json().catch(() => ({}));
                         console.log('Registration error:', errorData);
-                        const errorMsg = errorData.detail || 
-                                       errorData.non_field_errors?.[0] || 
-                                       JSON.stringify(errorData) ||
-                                       'Registration failed';
-                        this.showMessage('error', errorMsg);
+                        
+                        // Parse error messages
+                        let errorMsg = 'Registration failed. ';
+                        if (errorData.username) {
+                            errorMsg += 'Username already exists. ';
+                        }
+                        if (errorData.email) {
+                            errorMsg += 'Email already exists. ';
+                        }
+                        if (errorData.detail) {
+                            errorMsg += errorData.detail;
+                        }
+                        if (errorData.non_field_errors) {
+                            errorMsg += errorData.non_field_errors.join(' ');
+                        }
+                        
+                        this.showMessage('error', errorMsg || 'Please check your information and try again.');
                     }
                 } catch (error) {
                     console.error('Registration exception:', error);
-                    this.showMessage('error', 'Registration failed: ' + error.message);
+                    this.showMessage('error', 'Cannot connect to server. Please ensure backend is running at http://localhost:8001');
                 }
             }
 
@@ -763,7 +876,7 @@
             const accessToken = localStorage.getItem('access_token');
             if (accessToken) {
                 // Token exists, redirect to dashboard
-                window.location.href = '/index.html';
+                window.location.href = 'index.html';
             }
         });
     </script>
