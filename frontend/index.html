@@ -243,6 +243,7 @@
             <a href="../notifications-center.html">Alerts</a>
             <a href="../settings.html">Settings</a>
             <a href="../help.html">Help</a>
+            <button class="btn-support" onclick="openSupport()">Support</button>
             <button class="btn-logout" onclick="logout()">Logout</button>
         </div>
     </div>
@@ -409,5 +410,11 @@
         }
     });
 </script>
+    <script>
+    // Support button handler
+    function openSupport() {
+        alert('Contact support at support@civora.com or visit the Help page.');
+    }
+    </script>
 </body>
 </html>

@@ -91,7 +91,11 @@
             border-radius: 15px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
-            animation: slideIn 0.5s ease;
+            animation: fadeIn 0.7s cubic-bezier(.4,0,.2,1);
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: scale(0.98); }
+                    to { opacity: 1; transform: scale(1); }
+                }
         }
 
         @keyframes slideIn {
@@ -345,6 +349,24 @@
             font-size: 18px;
             color: transparent;
             font-size: 0;
+            box-shadow: 0 2px 8px rgba(66,133,244,0.08);
+            position: relative;
+        }
+
+        .social-btn[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            left: 50%;
+            top: 110%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 10;
+            opacity: 0.95;
         }
 
         .social-btn:hover {
@@ -452,6 +474,10 @@
                             <button class="toggle-password" onclick="togglePassword('loginPassword')">👁️</button>
                         </div>
                         <div class="error-message" id="loginPasswordError"></div>
+                        <div style="margin-top:8px;">
+                            <input type="checkbox" id="showPassword" onclick="toggleShowPassword()">
+                            <label for="showPassword" style="font-size:13px; color:#555; cursor:pointer;">Show Password</label>
+                        </div>
                     </div>
 
                     <span class="forgot-password-link" onclick="showForm('resetForm')">Forgot Password?</span>
@@ -468,7 +494,9 @@
                     <div class="divider"><span>OR</span></div>
 
                     <div class="social-login">
-                        <button class="social-btn" title="Login with Google" style="background-image: url('https://www.gstatic.com/images/branding/product/1x/googleg_standard_color_128dp.png'); background-size: 24px; background-position: center; background-repeat: no-repeat;"></button>
+                        <button class="social-btn" title="Login with Google" style="background-image: url('https://www.gstatic.com/images/branding/product/1x/googleg_standard_color_128dp.png'); background-size: 24px; background-position: center; background-repeat: no-repeat; margin-bottom: 2px;">
+                            <img src="https://www.gstatic.com/images/branding/product/1x/googleg_standard_color_128dp.png" alt="Google" style="width:24px; height:24px; display:inline-block; vertical-align:middle; margin-right:8px; background:none; box-shadow:none; border:none;">
+                        </button>
                         <button class="social-btn" title="Login with GitHub" style="background-image: url('social-icons/github.png'); background-size: 24px; background-position: center; background-repeat: no-repeat;"></button>
                     </div>
 
@@ -879,6 +907,13 @@
                 window.location.href = 'index.html';
             }
         });
+    </script>
+    <script>
+    // Show Password checkbox handler
+    function toggleShowPassword() {
+        var pw = document.getElementById('loginPassword');
+        pw.type = document.getElementById('showPassword').checked ? 'text' : 'password';
+    }
     </script>
 </body>
 </html>
