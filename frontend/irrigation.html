@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irrigation Planning - CropGuard AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
+        .card-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; }
+        .schedule-item { padding: 15px; background: #f8f9ff; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #667eea; }
+        .time { font-weight: 600; color: #333; }
+        .duration { font-size: 12px; color: #666; }
+        .amount { font-size: 13px; color: #333; margin: 5px 0; }
+        .soil-meter { 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .meter-bar {
+            flex: 1;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        .meter-value { font-weight: 600; color: #333; min-width: 40px; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover { background: #5568d3; }
+        .weather-factor {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .factor-item {
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💧 Irrigation Planning System</h1>
+            <p>AI-optimized irrigation schedules based on weather and soil conditions</p>
+        </div>
+
+        <div class="grid">
+            <!-- Today's Schedule -->
+            <div class="card">
+                <div class="card-title">📅 Today's Schedule</div>
+                <div class="schedule-item">
+                    <div class="time">6:00 AM - 6:45 AM</div>
+                    <div class="duration">Duration: 45 minutes</div>
+                    <div class="amount">Amount: 2000 gallons</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 5px;">Status: Scheduled</div>
+                </div>
+                <div class="schedule-item">
+                    <div class="time">4:00 PM - 4:30 PM</div>
+                    <div class="duration">Duration: 30 minutes</div>
+                    <div class="amount">Amount: 1500 gallons</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 5px;">Status: Pending</div>
+                </div>
+                <button>⏱️ Start Irrigation Now</button>
+            </div>
+
+            <!-- Soil Moisture -->
+            <div class="card">
+                <div class="card-title">🌍 Soil Conditions</div>
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 13px; margin-bottom: 8px; color: #666;">Moisture Level</div>
+                    <div class="soil-meter">
+                        <div class="meter-bar" style="width: 100%;">
+                            <div class="meter-fill" style="width: 65%;"></div>
+                        </div>
+                        <div class="meter-value">65%</div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 13px; margin-bottom: 8px; color: #666;">Soil Temperature</div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 600;">22°C</span>
+                        <span style="color: #999; font-size: 12px;">Optimal range</span>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size: 13px; margin-bottom: 8px; color: #666;">pH Level</div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 600;">6.8</span>
+                        <span style="color: #999; font-size: 12px;">Good for crops</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weather Factors -->
+            <div class="card">
+                <div class="card-title">🌤️ Weather Impact</div>
+                <div class="weather-factor">
+                    <div class="factor-item">
+                        <div style="font-size: 20px; margin-bottom: 5px;">☀️</div>
+                        <div style="color: #666;">Evaporation: 4.2mm</div>
+                    </div>
+                    <div class="factor-item">
+                        <div style="font-size: 20px; margin-bottom: 5px;">💨</div>
+                        <div style="color: #666;">Wind: 12 km/h</div>
+                    </div>
+                    <div class="factor-item">
+                        <div style="font-size: 20px; margin-bottom: 5px;">💧</div>
+                        <div style="color: #666;">Humidity: 65%</div>
+                    </div>
+                    <div class="factor-item">
+                        <div style="font-size: 20px; margin-bottom: 5px;">🌧️</div>
+                        <div style="color: #666;">Rain: 20%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Schedule -->
+            <div class="card">
+                <div class="card-title">📊 Weekly Schedule</div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; justify-content: space-between; padding: 8px; background: #f0f0f0; border-radius: 4px; font-size: 12px;">
+                        <span>Monday</span>
+                        <span>6:00 AM</span>
+                        <span style="color: #667eea; font-weight: 600;">45 min</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px; background: #f0f0f0; border-radius: 4px; font-size: 12px;">
+                        <span>Tuesday</span>
+                        <span>6:00 AM</span>
+                        <span style="color: #667eea; font-weight: 600;">40 min</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px; background: #f0f0f0; border-radius: 4px; font-size: 12px;">
+                        <span>Wednesday</span>
+                        <span>Skip (Rain expected)</span>
+                        <span style="color: #999;">-</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px; background: #f0f0f0; border-radius: 4px; font-size: 12px;">
+                        <span>Thursday</span>
+                        <span>6:00 AM</span>
+                        <span style="color: #667eea; font-weight: 600;">35 min</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Water Usage -->
+            <div class="card">
+                <div class="card-title">📈 Water Usage</div>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px;">
+                            <span>Daily Average</span>
+                            <span style="font-weight: 600;">3500 gallons</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px;">
+                            <span>This Week</span>
+                            <span style="font-weight: 600;">21,000 gallons</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px;">
+                            <span>This Month</span>
+                            <span style="font-weight: 600;">94,500 gallons</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="card">
+                <div class="card-title">💡 Irrigation Tips</div>
+                <ul style="font-size: 13px; line-height: 1.8;">
+                    <li>✅ Water deeply but less frequently</li>
+                    <li>✅ Irrigate in early morning hours</li>
+                    <li>✅ Check soil moisture before watering</li>
+                    <li>✅ Maintain consistent schedules</li>
+                    <li>✅ Monitor weather forecasts</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

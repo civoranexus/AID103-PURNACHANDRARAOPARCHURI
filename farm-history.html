@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm History - CropGuard AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            font-size: 2.5em;
+        }
+
+        /* Filters */
+        .filters {
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Content */
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        /* Cards */
+        .card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            font-size: 1.5em;
+        }
+
+        /* Yield History */
+        .yield-item {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .yield-info h4 {
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .yield-info p {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .yield-value {
+            text-align: right;
+        }
+
+        .yield-value .amount {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .yield-value .trend {
+            font-size: 0.9em;
+            color: #10b981;
+        }
+
+        .trend.down {
+            color: #ef4444;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            padding-left: 40px;
+            padding-bottom: 20px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #e9ecef;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 20px;
+            width: 2px;
+            height: calc(100% - 10px);
+            background: #e9ecef;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-date {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 0.9em;
+        }
+
+        .timeline-desc {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        /* Charts */
+        .chart-container {
+            margin: 20px 0;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 300px;
+        }
+
+        .chart-bar {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            height: 200px;
+            margin: 20px 0;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            min-height: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+            transform: translateY(-5px);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 700;
+            color: #667eea;
+            font-size: 0.9em;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Disease Timeline */
+        .disease-record {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ef4444;
+        }
+
+        .disease-record.resolved {
+            border-left-color: #10b981;
+        }
+
+        .disease-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .disease-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .disease-badge {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .disease-badge.resolved {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .disease-details {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Export Button */
+        .export-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .filters {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <span class="header-icon">📊</span>
+                Farm History & Analytics
+            </h1>
+            <button class="export-btn" onclick="exportData()">📥 Export Report</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>Farm:</label>
+                <select onchange="filterData()">
+                    <option>All Farms</option>
+                    <option>North Field Farm</option>
+                    <option>South Orchard</option>
+                    <option>East Vineyard</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Year:</label>
+                <select onchange="filterData()">
+                    <option>2024</option>
+                    <option>2023</option>
+                    <option>2022</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Crop:</label>
+                <select onchange="filterData()">
+                    <option>All Crops</option>
+                    <option>Wheat</option>
+                    <option>Rice</option>
+                    <option>Cotton</option>
+                    <option>Maize</option>
+                </select>
+            </div>
+            <div class="filter-group" style="margin-left: auto;">
+                <input type="date" onchange="filterData()">
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Crop Yield Trends -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">📈</span>
+                    <span>Crop Yield Trends</span>
+                </div>
+
+                <div class="yield-item">
+                    <div class="yield-info">
+                        <h4>2024 Wheat</h4>
+                        <p>Harvested: May 2024</p>
+                    </div>
+                    <div class="yield-value">
+                        <div class="amount">42 tons</div>
+                        <div class="trend">↑ 12.5% vs 2023</div>
+                    </div>
+                </div>
+
+                <div class="yield-item">
+                    <div class="yield-info">
+                        <h4>2024 Rice</h4>
+                        <p>Harvested: October 2024</p>
+                    </div>
+                    <div class="yield-value">
+                        <div class="amount">38 tons</div>
+                        <div class="trend">↑ 8.3% vs 2023</div>
+                    </div>
+                </div>
+
+                <div class="yield-item">
+                    <div class="yield-info">
+                        <h4>2024 Cotton</h4>
+                        <p>Harvested: December 2024</p>
+                    </div>
+                    <div class="yield-value">
+                        <div class="amount">8.5 tons</div>
+                        <div class="trend down">↓ 5.2% vs 2023</div>
+                    </div>
+                </div>
+
+                <div class="yield-item">
+                    <div class="yield-info">
+                        <h4>2024 Maize</h4>
+                        <p>Harvested: August 2024</p>
+                    </div>
+                    <div class="yield-value">
+                        <div class="amount">28 tons</div>
+                        <div class="trend">↑ 15.2% vs 2023</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Total 2024 Yield</div>
+                        <div class="stat-value">116.5 tons</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">YoY Change</div>
+                        <div class="stat-value">+8.2%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seasonal Performance -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">📊</span>
+                    <span>Seasonal Performance (2024)</span>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-bar">
+                        <div class="bar" style="height: 85%;">
+                            <div class="bar-value">42</div>
+                            <div class="bar-label">Spring</div>
+                        </div>
+                        <div class="bar" style="height: 78%;">
+                            <div class="bar-value">38</div>
+                            <div class="bar-label">Summer</div>
+                        </div>
+                        <div class="bar" style="height: 65%;">
+                            <div class="bar-value">28</div>
+                            <div class="bar-label">Fall</div>
+                        </div>
+                        <div class="bar" style="height: 72%;">
+                            <div class="bar-value">8.5</div>
+                            <div class="bar-label">Winter</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Best Season</div>
+                        <div class="stat-value">Spring</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avg Yield</div>
+                        <div class="stat-value">29.1T</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disease History -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🦠</span>
+                    <span>Disease History</span>
+                </div>
+
+                <div class="disease-record">
+                    <div class="disease-header">
+                        <span class="disease-name">Powdery Mildew</span>
+                        <span class="disease-badge resolved">Resolved</span>
+                    </div>
+                    <div class="disease-details">
+                        📍 North Field | Detected: May 2024 | Severity: Medium<br>
+                        Treated with Sulfur spray. Recovery time: 2 weeks
+                    </div>
+                </div>
+
+                <div class="disease-record">
+                    <div class="disease-header">
+                        <span class="disease-name">Early Blight</span>
+                        <span class="disease-badge resolved">Resolved</span>
+                    </div>
+                    <div class="disease-details">
+                        📍 South Orchard | Detected: July 2024 | Severity: High<br>
+                        Fungicide applied. Yield impact: ~8%
+                    </div>
+                </div>
+
+                <div class="disease-record">
+                    <div class="disease-header">
+                        <span class="disease-name">Leaf Rust</span>
+                        <span class="disease-badge resolved">Resolved</span>
+                    </div>
+                    <div class="disease-details">
+                        📍 East Vineyard | Detected: September 2024 | Severity: Low<br>
+                        Managed with cultural practices only
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Diseases 2024</div>
+                        <div class="stat-value">3</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avg Recovery</div>
+                        <div class="stat-value">12 days</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Timeline -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">📅</span>
+                    <span>2024 Timeline</span>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">January 15</div>
+                        <div class="timeline-desc">🌱 Spring planting started - Wheat (50 acres)</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">May 10</div>
+                        <div class="timeline-desc">🦠 Powdery mildew detected - Treatment applied</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">May 28</div>
+                        <div class="timeline-desc">🚜 Wheat harvest completed - 42 tons yield</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">June 5</div>
+                        <div class="timeline-desc">🌱 Monsoon planting - Rice (60 acres)</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">July 15</div>
+                        <div class="timeline-desc">⛈️ Heavy rainfall (120mm) - Irrigation stopped</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">October 5</div>
+                        <div class="timeline-desc">🚜 Rice harvest - 38 tons yield</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pest Management -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🐛</span>
+                    <span>Pest Management Records</span>
+                </div>
+
+                <div class="disease-record">
+                    <div class="disease-header">
+                        <span class="disease-name">Aphids</span>
+                        <span class="disease-badge">Medium</span>
+                    </div>
+                    <div class="disease-details">
+                        📍 North Field | Detected: June 2024<br>
+                        Treatment: Neem oil spray (3 applications)<br>
+                        Status: ✓ Controlled | Yield impact: 2%
+                    </div>
+                </div>
+
+                <div class="disease-record">
+                    <div class="disease-header">
+                        <span class="disease-name">Bollworms</span>
+                        <span class="disease-badge">High</span>
+                    </div>
+                    <div class="disease-details">
+                        📍 South Orchard | Detected: August 2024<br>
+                        Treatment: Biological control + insecticide<br>
+                        Status: ✓ Controlled | Yield impact: 6%
+                    </div>
+                </div>
+
+                <div class="disease-record">
+                    <div class="disease-header">
+                        <span class="disease-name">Whiteflies</span>
+                        <span class="disease-badge">Low</span>
+                    </div>
+                    <div class="disease-details">
+                        📍 East Vineyard | Detected: October 2024<br>
+                        Treatment: Yellow sticky traps<br>
+                        Status: ✓ Managed | Yield impact: <1%
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Pests 2024</div>
+                        <div class="stat-value">3</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avg Loss</div>
+                        <div class="stat-value">2.7%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weather Patterns -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🌦️</span>
+                    <span>Weather Impact Analysis</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Total Rainfall</div>
+                        <div class="stat-value">1,250 mm</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avg Temperature</div>
+                        <div class="stat-value">26.5°C</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Drought Days</div>
+                        <div class="stat-value">45</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Frost Days</div>
+                        <div class="stat-value">3</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="margin-bottom: 10px; color: #1f2937;">Key Observations:</h4>
+                    <ul style="margin-left: 20px; color: #666; line-height: 1.8;">
+                        <li>Monsoon arrived 5 days late (June 5 vs June 1)</li>
+                        <li>August-September had excess rainfall (520mm vs 300mm avg)</li>
+                        <li>January-February was drier than usual (-60mm)</li>
+                        <li>Temperature variations favorable for crop growth</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class FarmHistory {
+            constructor() {
+                this.initialize();
+            }
+
+            initialize() {
+                console.log('Farm History initialized');
+            }
+
+            filterData() {
+                const farm = document.querySelector('[onchange="filterData()"]').value;
+                console.log('Filtering by:', farm);
+            }
+
+            exportData() {
+                alert('Generating export... Report will be downloaded as PDF');
+                // Simulate export
+                const element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('Farm History Export - 2024'));
+                element.setAttribute('download', 'farm_history_2024.pdf');
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            }
+        }
+
+        const farmHistory = new FarmHistory();
+
+        function filterData() {
+            farmHistory.filterData();
+        }
+
+        function exportData() {
+            farmHistory.exportData();
+        }
+    </script>
+</body>
+</html>

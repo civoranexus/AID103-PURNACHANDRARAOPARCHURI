@@ -1,0 +1,74 @@
+{
+  "verified_files": [
+    {
+      "file": "index.html",
+      "category": "Root Files",
+      "size_bytes": 17492
+    },
+    {
+      "file": "style.css",
+      "category": "Root Files",
+      "size_bytes": 19758
+    },
+    {
+      "file": "script.js",
+      "category": "Root Files",
+      "size_bytes": 35024
+    },
+    {
+      "file": "language-support.js",
+      "category": "Root Files",
+      "size_bytes": 17972
+    },
+    {
+      "file": "frontend/auth.html",
+      "category": "Frontend Files",
+      "size_bytes": 27472
+    },
+    {
+      "file": "frontend/short_logo.png",
+      "category": "Frontend Files",
+      "size_bytes": 3497
+    },
+    {
+      "file": "frontend/social-icons/github.png",
+      "category": "Frontend Files",
+      "size_bytes": 13104
+    },
+    {
+      "file": "frontend/navigation.js",
+      "category": "Frontend Files",
+      "size_bytes": 11401
+    },
+    {
+      "file": "frontend/theme-toggle.js",
+      "category": "Frontend Files",
+      "size_bytes": 4721
+    }
+  ],
+  "missing_files": [],
+  "file_dependencies": {
+    "index.html": {
+      "dependencies": [
+        "style.css",
+        "script.js",
+        "language-support.js"
+      ],
+      "all_satisfied": true
+    },
+    "frontend/auth.html": {
+      "dependencies": [
+        "frontend/short_logo.png",
+        "frontend/social-icons/github.png"
+      ],
+      "all_satisfied": true
+    },
+    "script.js": {
+      "dependencies": [
+        "language-support.js"
+      ],
+      "all_satisfied": true
+    }
+  },
+  "status": "ALL FILES VERIFIED \u2705"
+}

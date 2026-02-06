@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - CropGuard AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            font-size: 2.5em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-header {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-header:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Main Content */
+        .content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #f8f9fa;
+            border-right: 2px solid #e9ecef;
+            padding: 20px;
+            max-height: 700px;
+            overflow-y: auto;
+        }
+
+        .settings-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .menu-item {
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            color: #666;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: #e9ecef;
+            color: #667eea;
+        }
+
+        .menu-item.active {
+            background: #e0e7ff;
+            color: #667eea;
+            border-left-color: #667eea;
+            font-weight: 600;
+        }
+
+        .menu-icon {
+            font-size: 1.2em;
+        }
+
+        /* Settings Panels */
+        .settings-area {
+            padding: 40px;
+            overflow-y: auto;
+            max-height: 700px;
+        }
+
+        .settings-panel {
+            display: none;
+        }
+
+        .settings-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-title {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-subtitle {
+            color: #999;
+            margin-bottom: 25px;
+            font-size: 0.9em;
+        }
+
+        /* Profile Section */
+        .profile-header {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .profile-info h2 {
+            font-size: 1.3em;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .avatar-upload {
+            margin-top: 10px;
+        }
+
+        .avatar-upload input {
+            display: none;
+        }
+
+        .avatar-upload-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-upload-btn:hover {
+            background: #764ba2;
+        }
+
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .form-section h3 {
+            font-size: 1.1em;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-grid.single {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-help {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        /* Toggle Switch */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .toggle-label {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+        }
+
+        .toggle-label strong {
+            color: #1f2937;
+            font-size: 0.95em;
+        }
+
+        .toggle-label span {
+            color: #999;
+            font-size: 0.85em;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 28px;
+            background: #ccc;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            left: 24px;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            background: #e9ecef;
+            color: #666;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .btn-danger {
+            flex: 1;
+            padding: 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Farm Management */
+        .farm-card {
+            padding: 20px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .farm-card:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .farm-info h4 {
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .farm-info p {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .farm-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .farm-actions button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .farm-actions .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+
+        .farm-actions .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #047857;
+            border-left: 4px solid #047857;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #991b1b;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-right: none;
+                border-bottom: 2px solid #e9ecef;
+                display: flex;
+                overflow-x: auto;
+                padding: 10px;
+            }
+
+            .settings-menu {
+                flex-direction: row;
+            }
+
+            .menu-item {
+                white-space: nowrap;
+                padding: 10px 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <span class="header-icon">⚙️</span>
+                Settings & Profile
+            </h1>
+            <div class="header-actions">
+                <button class="btn-header" onclick="goBack()">← Back</button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Sidebar Menu -->
+            <div class="sidebar">
+                <div class="settings-menu">
+                    <div class="menu-item active" onclick="switchPanel('profile')">
+                        <span class="menu-icon">👤</span>
+                        <span>Profile</span>
+                    </div>
+                    <div class="menu-item" onclick="switchPanel('password')">
+                        <span class="menu-icon">🔐</span>
+                        <span>Password</span>
+                    </div>
+                    <div class="menu-item" onclick="switchPanel('notifications')">
+                        <span class="menu-icon">🔔</span>
+                        <span>Notifications</span>
+                    </div>
+                    <div class="menu-item" onclick="switchPanel('language')">
+                        <span class="menu-icon">🌍</span>
+                        <span>Language</span>
+                    </div>
+                    <div class="menu-item" onclick="switchPanel('farms')">
+                        <span class="menu-icon">🌾</span>
+                        <span>Farms</span>
+                    </div>
+                    <div class="menu-item" onclick="switchPanel('privacy')">
+                        <span class="menu-icon">🔒</span>
+                        <span>Privacy</span>
+                    </div>
+                    <div class="menu-item" onclick="switchPanel('help')">
+                        <span class="menu-icon">❓</span>
+                        <span>Help</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Panels -->
+            <div class="settings-area">
+                <div id="alert-container"></div>
+
+                <!-- Profile Panel -->
+                <div id="profile" class="settings-panel active">
+                    <div class="panel-title">
+                        <span>👤</span>
+                        <span>Profile Information</span>
+                    </div>
+                    <p class="panel-subtitle">Update your personal information and profile details</p>
+
+                    <div class="profile-header">
+                        <div class="profile-avatar" id="avatarDisplay">👨</div>
+                        <div class="profile-info">
+                            <h2 id="profileName">Purna Chandra Rao</h2>
+                            <p>Farmer ID: FARMER-2024-001</p>
+                            <p>Member Since: January 2024</p>
+                            <div class="avatar-upload">
+                                <input type="file" id="avatarInput" accept="image/*">
+                                <button class="avatar-upload-btn" onclick="document.getElementById('avatarInput').click()">Change Avatar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>👤 Personal Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>First Name</label>
+                                <input type="text" value="Purna" placeholder="First Name">
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name</label>
+                                <input type="text" value="Chandra Rao" placeholder="Last Name">
+                            </div>
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" value="purna@cropguard.ai" placeholder="Email">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" value="+91 9876543210" placeholder="Phone">
+                            </div>
+                            <div class="form-group">
+                                <label>Date of Birth</label>
+                                <input type="date" value="1985-05-15">
+                            </div>
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select>
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>🏠 Address Information</h3>
+                        <div class="form-grid single">
+                            <div class="form-group">
+                                <label>Street Address</label>
+                                <input type="text" value="123 Farm Road, Agriculture District" placeholder="Street">
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>City</label>
+                                    <input type="text" value="Hyderabad" placeholder="City">
+                                </div>
+                                <div class="form-group">
+                                    <label>State</label>
+                                    <input type="text" value="Telangana" placeholder="State">
+                                </div>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Postal Code</label>
+                                    <input type="text" value="500016" placeholder="Postal Code">
+                                </div>
+                                <div class="form-group">
+                                    <label>Country</label>
+                                    <input type="text" value="India" placeholder="Country">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>🌾 Farm Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Farm Size (acres)</label>
+                                <input type="number" value="150" placeholder="Farm size">
+                            </div>
+                            <div class="form-group">
+                                <label>Primary Crop</label>
+                                <select>
+                                    <option>Wheat</option>
+                                    <option>Rice</option>
+                                    <option>Maize</option>
+                                    <option>Cotton</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Farming Experience (years)</label>
+                                <input type="number" value="25" placeholder="Experience">
+                            </div>
+                            <div class="form-group">
+                                <label>Farm Type</label>
+                                <select>
+                                    <option>Organic</option>
+                                    <option>Conventional</option>
+                                    <option>Mixed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="showAlert('Profile updated successfully!', 'success')">Save Changes</button>
+                        <button class="btn-secondary" onclick="resetForm()">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Password Panel -->
+                <div id="password" class="settings-panel">
+                    <div class="panel-title">
+                        <span>🔐</span>
+                        <span>Change Password</span>
+                    </div>
+                    <p class="panel-subtitle">Update your account password</p>
+
+                    <div class="form-section">
+                        <div class="form-grid single">
+                            <div class="form-group">
+                                <label>Current Password</label>
+                                <input type="password" placeholder="Enter current password">
+                                <span class="form-help">For security, we'll ask for your current password</span>
+                            </div>
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" placeholder="Enter new password">
+                                <span class="form-help">At least 8 characters with uppercase, lowercase, number and symbol</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm Password</label>
+                                <input type="password" placeholder="Confirm new password">
+                                <span class="form-help">Passwords must match</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>🔓 Password Requirements</h3>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li>Minimum 8 characters</li>
+                            <li>At least one uppercase letter (A-Z)</li>
+                            <li>At least one lowercase letter (a-z)</li>
+                            <li>At least one number (0-9)</li>
+                            <li>At least one special character (!@#$%^&*)</li>
+                        </ul>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="showAlert('Password changed successfully!', 'success')">Update Password</button>
+                        <button class="btn-secondary" onclick="switchPanel('profile')">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Notifications Panel -->
+                <div id="notifications" class="settings-panel">
+                    <div class="panel-title">
+                        <span>🔔</span>
+                        <span>Notification Preferences</span>
+                    </div>
+                    <p class="panel-subtitle">Control how you receive notifications</p>
+
+                    <div class="form-section">
+                        <h3>📧 Email Notifications</h3>
+                        <div class="toggle-group">
+                            <div class="toggle-label">
+                                <strong>Disease Alerts</strong>
+                                <span>Get alerts when diseases are detected</span>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                        <div class="toggle-group">
+                            <div class="toggle-label">
+                                <strong>Pest Warnings</strong>
+                                <span>Receive pest management recommendations</span>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                        <div class="toggle-group">
+                            <div class="toggle-label">
+                                <strong>Weather Updates</strong>
+                                <span>Get notified about weather changes</span>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📱 Push Notifications</h3>
+                        <div class="toggle-group">
+                            <div class="toggle-label">
+                                <strong>High Priority Alerts</strong>
+                                <span>Only urgent alerts and critical issues</span>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                        <div class="toggle-group">
+                            <div class="toggle-label">
+                                <strong>Irrigation Reminders</strong>
+                                <span>Reminders for scheduled irrigation</span>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+                        </div>
+                        <div class="toggle-group">
+                            <div class="toggle-label">
+                                <strong>Market Price Updates</strong>
+                                <span>Price changes for your crops</span>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>⏱️ Notification Frequency</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Email Frequency</label>
+                                <select>
+                                    <option>Immediate</option>
+                                    <option>Daily Summary</option>
+                                    <option>Weekly Summary</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Quiet Hours</label>
+                                <input type="time" value="22:00">
+                                <span class="form-help">No notifications after this time</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="showAlert('Notification preferences saved!', 'success')">Save Preferences</button>
+                    </div>
+                </div>
+
+                <!-- Language Panel -->
+                <div id="language" class="settings-panel">
+                    <div class="panel-title">
+                        <span>🌍</span>
+                        <span>Language & Localization</span>
+                    </div>
+                    <p class="panel-subtitle">Select your preferred language and regional settings</p>
+
+                    <div class="form-section">
+                        <h3>🗣️ Language</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Interface Language</label>
+                                <select>
+                                    <option selected>English</option>
+                                    <option>हिन्दी (Hindi)</option>
+                                    <option>తెలుగు (Telugu)</option>
+                                    <option>தமிழ் (Tamil)</option>
+                                    <option>मराठी (Marathi)</option>
+                                    <option>ગુજરાતી (Gujarati)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Region</label>
+                                <select>
+                                    <option selected>India</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📊 Units & Format</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Temperature Unit</label>
+                                <select>
+                                    <option selected>Celsius (°C)</option>
+                                    <option>Fahrenheit (°F)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Distance Unit</label>
+                                <select>
+                                    <option selected>Metric (km, m)</option>
+                                    <option>Imperial (miles, ft)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Water Volume</label>
+                                <select>
+                                    <option selected>Liters (L)</option>
+                                    <option>Gallons (gal)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Currency</label>
+                                <select>
+                                    <option selected>Indian Rupee (₹)</option>
+                                    <option>US Dollar ($)</option>
+                                    <option>Euro (€)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📅 Date & Time</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Date Format</label>
+                                <select>
+                                    <option selected>DD/MM/YYYY</option>
+                                    <option>MM/DD/YYYY</option>
+                                    <option>YYYY-MM-DD</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Time Format</label>
+                                <select>
+                                    <option selected>24-Hour (HH:MM)</option>
+                                    <option>12-Hour (HH:MM AM/PM)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="showAlert('Language settings updated!', 'success')">Apply Changes</button>
+                    </div>
+                </div>
+
+                <!-- Farms Panel -->
+                <div id="farms" class="settings-panel">
+                    <div class="panel-title">
+                        <span>🌾</span>
+                        <span>Manage Farms</span>
+                    </div>
+                    <p class="panel-subtitle">Add, edit, or remove your farms</p>
+
+                    <div class="form-section">
+                        <h3>📍 Your Farms</h3>
+                        <div class="farm-card">
+                            <div class="farm-info">
+                                <h4>North Field Farm</h4>
+                                <p>📍 Hyderabad, Telangana | 50 acres | Wheat, Rice</p>
+                                <p>Health Score: 87% | Last Updated: 2 hours ago</p>
+                            </div>
+                            <div class="farm-actions">
+                                <button class="btn-edit" onclick="editFarm('farm-1')">Edit</button>
+                                <button class="btn-delete" onclick="deleteFarm('farm-1')">Delete</button>
+                            </div>
+                        </div>
+
+                        <div class="farm-card">
+                            <div class="farm-info">
+                                <h4>South Orchard</h4>
+                                <p>📍 Hyderabad, Telangana | 75 acres | Cotton, Maize</p>
+                                <p>Health Score: 82% | Last Updated: 4 hours ago</p>
+                            </div>
+                            <div class="farm-actions">
+                                <button class="btn-edit" onclick="editFarm('farm-2')">Edit</button>
+                                <button class="btn-delete" onclick="deleteFarm('farm-2')">Delete</button>
+                            </div>
+                        </div>
+
+                        <div class="farm-card">
+                            <div class="farm-info">
+                                <h4>East Vineyard</h4>
+                                <p>📍 Hyderabad, Telangana | 25 acres | Grapes</p>
+                                <p>Health Score: 91% | Last Updated: 1 hour ago</p>
+                            </div>
+                            <div class="farm-actions">
+                                <button class="btn-edit" onclick="editFarm('farm-3')">Edit</button>
+                                <button class="btn-delete" onclick="deleteFarm('farm-3')">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>➕ Add New Farm</h3>
+                        <div class="form-grid single">
+                            <div class="form-group">
+                                <label>Farm Name</label>
+                                <input type="text" placeholder="Enter farm name">
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Location</label>
+                                    <input type="text" placeholder="City, State">
+                                </div>
+                                <div class="form-group">
+                                    <label>Farm Size (acres)</label>
+                                    <input type="number" placeholder="Size in acres">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Primary Crops</label>
+                                <input type="text" placeholder="Comma-separated crops">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="showAlert('Farm added successfully!', 'success')">Add Farm</button>
+                        <button class="btn-secondary" onclick="switchPanel('profile')">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Privacy Panel -->
+                <div id="privacy" class="settings-panel">
+                    <div class="panel-title">
+                        <span>🔒</span>
+                        <span>Privacy & Security</span>
+                    </div>
+                    <p class="panel-subtitle">Manage your privacy and security settings</p>
+
+                    <div class="form-section">
+                        <h3>🔐 Security</h3>
+                        <div class="toggle-group">
+                            <div class="toggle-label">
+                                <strong>Two-Factor Authentication</strong>
+                                <span>Secure your account with 2FA</span>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+                        </div>
+                        <div class="toggle-group">
+                            <div class="toggle-label">
+                                <strong>Login Alerts</strong>
+                                <span>Get notified of new sign-ins</span>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>👁️ Privacy</h3>
+                        <div class="toggle-group">
+                            <div class="toggle-label">
+                                <strong>Share Farm Data Anonymously</strong>
+                                <span>Help improve AI models</span>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                        <div class="toggle-group">
+                            <div class="toggle-label">
+                                <strong>Farm Visibility</strong>
+                                <span>Allow other farmers to see your farm</span>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>🗑️ Data Management</h3>
+                        <div class="btn-group">
+                            <button class="btn-secondary" onclick="downloadData()">Download My Data</button>
+                            <button class="btn-danger" onclick="deleteAccount()">Delete Account</button>
+                        </div>
+                        <p class="form-help" style="margin-top: 15px;">
+                            Download all your personal data in standard format or permanently delete your account.
+                        </p>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="showAlert('Privacy settings saved!', 'success')">Save Settings</button>
+                    </div>
+                </div>
+
+                <!-- Help Panel -->
+                <div id="help" class="settings-panel">
+                    <div class="panel-title">
+                        <span>❓</span>
+                        <span>Help & Support</span>
+                    </div>
+                    <p class="panel-subtitle">Get help and manage your support tickets</p>
+
+                    <div class="form-section">
+                        <h3>📞 Contact Support</h3>
+                        <div class="form-grid single">
+                            <div class="form-group">
+                                <label>Support Email</label>
+                                <input type="email" value="support@cropguard.ai" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Support Phone</label>
+                                <input type="tel" value="+91 1800-123-4567" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📚 Helpful Links</h3>
+                        <ul style="list-style: none;">
+                            <li><a href="#" style="color: #667eea;">📖 User Documentation</a></li>
+                            <li><a href="#" style="color: #667eea;">🎓 Video Tutorials</a></li>
+                            <li><a href="#" style="color: #667eea;">❓ Frequently Asked Questions</a></li>
+                            <li><a href="#" style="color: #667eea;">🐛 Report a Bug</a></li>
+                            <li><a href="#" style="color: #667eea;">💡 Feature Request</a></li>
+                            <li><a href="#" style="color: #667eea;">📋 Terms of Service</a></li>
+                            <li><a href="#" style="color: #667eea;">🔒 Privacy Policy</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📱 Submit Feedback</h3>
+                        <div class="form-group">
+                            <label>Your Message</label>
+                            <textarea placeholder="Tell us how we can improve..."></textarea>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn-primary" onclick="showAlert('Thank you for your feedback!', 'success')">Submit Feedback</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class SettingsManager {
+            constructor() {
+                this.currentPanel = 'profile';
+            }
+
+            switchPanel(panelId) {
+                // Hide all panels
+                document.querySelectorAll('.settings-panel').forEach(panel => {
+                    panel.classList.remove('active');
+                });
+
+                // Show selected panel
+                document.getElementById(panelId).classList.add('active');
+
+                // Update menu active state
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                event.target.closest('.menu-item').classList.add('active');
+
+                this.currentPanel = panelId;
+            }
+
+            toggleSwitch(element) {
+                element.classList.toggle('active');
+            }
+
+            showAlert(message, type = 'success') {
+                const container = document.getElementById('alert-container');
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type} show`;
+                alert.textContent = message;
+                container.appendChild(alert);
+
+                setTimeout(() => {
+                    alert.remove();
+                }, 3000);
+            }
+
+            resetForm() {
+                document.querySelectorAll('input, select, textarea').forEach(field => {
+                    if (field.hasAttribute('value')) {
+                        field.value = field.getAttribute('value');
+                    }
+                });
+                this.showAlert('Form reset', 'success');
+            }
+
+            editFarm(farmId) {
+                alert('Edit farm: ' + farmId);
+            }
+
+            deleteFarm(farmId) {
+                if (confirm('Are you sure you want to delete this farm?')) {
+                    event.target.closest('.farm-card').remove();
+                    this.showAlert('Farm deleted', 'success');
+                }
+            }
+
+            downloadData() {
+                alert('Downloading your data...');
+            }
+
+            deleteAccount() {
+                if (confirm('This will permanently delete your account. Are you sure?')) {
+                    this.showAlert('Account deletion initiated. Check your email.', 'success');
+                }
+            }
+
+            goBack() {
+                window.history.back();
+            }
+        }
+
+        const settings = new SettingsManager();
+
+        // Global functions
+        function switchPanel(panelId) {
+            settings.switchPanel(panelId);
+        }
+
+        function toggleSwitch(element) {
+            settings.toggleSwitch(element);
+        }
+
+        function showAlert(message, type) {
+            settings.showAlert(message, type);
+        }
+
+        function resetForm() {
+            settings.resetForm();
+        }
+
+        function editFarm(farmId) {
+            settings.editFarm(farmId);
+        }
+
+        function deleteFarm(farmId) {
+            settings.deleteFarm(farmId);
+        }
+
+        function downloadData() {
+            settings.downloadData();
+        }
+
+        function deleteAccount() {
+            settings.deleteAccount();
+        }
+
+        function goBack() {
+            settings.goBack();
+        }
+    </script>
+</body>
+</html>

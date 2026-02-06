@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Prices - CropGuard AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
+        .card-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; }
+        .price-card {
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .crop-name { font-weight: 600; color: #333; margin-bottom: 5px; }
+        .price-row { display: flex; justify-content: space-between; font-size: 13px; margin: 5px 0; }
+        .price-label { color: #666; }
+        .price-value { font-weight: 600; color: #333; }
+        .trend { font-size: 11px; color: #999; margin-top: 5px; }
+        .up { color: #51cf66; }
+        .down { color: #ff6b6b; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover { background: #5568d3; }
+        .chart { height: 200px; background: #f0f0f0; border-radius: 8px; margin: 15px 0; display: flex; align-items: flex-end; justify-content: space-around; padding: 10px; }
+        .bar { width: 12%; height: 60%; background: linear-gradient(180deg, #667eea, #764ba2); border-radius: 4px 4px 0 0; }
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 6px 12px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .filter-btn.active { background: #667eea; color: white; }
+        .news-item {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 12px;
+        }
+        .news-date { color: #999; font-size: 11px; }
+        .news-title { color: #333; font-weight: 600; margin: 3px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Market Prices & Analysis</h1>
+            <p>Real-time crop prices and market trends</p>
+        </div>
+
+        <div class="grid">
+            <!-- Price Listing -->
+            <div class="card">
+                <div class="card-title">📊 Current Market Prices</div>
+                <div class="price-card">
+                    <div class="crop-name">🌾 Wheat</div>
+                    <div class="price-row">
+                        <span class="price-label">Today's Price</span>
+                        <span class="price-value">₹2,450 / quintal</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">Average</span>
+                        <span class="price-value">₹2,380</span>
+                    </div>
+                    <div class="trend"><span class="up">↑ +2.9% </span>from yesterday</div>
+                </div>
+
+                <div class="price-card">
+                    <div class="crop-name">🌾 Rice</div>
+                    <div class="price-row">
+                        <span class="price-label">Today's Price</span>
+                        <span class="price-value">₹3,150 / quintal</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">Average</span>
+                        <span class="price-value">₹3,100</span>
+                    </div>
+                    <div class="trend"><span class="up">↑ +1.6% </span>from yesterday</div>
+                </div>
+
+                <div class="price-card">
+                    <div class="crop-name">🌽 Maize</div>
+                    <div class="price-row">
+                        <span class="price-label">Today's Price</span>
+                        <span class="price-value">₹1,890 / quintal</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">Average</span>
+                        <span class="price-value">₹1,920</span>
+                    </div>
+                    <div class="trend"><span class="down">↓ -1.6% </span>from yesterday</div>
+                </div>
+
+                <div class="price-card">
+                    <div class="crop-name">🥬 Cotton</div>
+                    <div class="price-row">
+                        <span class="price-label">Today's Price</span>
+                        <span class="price-value">₹6,500 / quintal</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">Average</span>
+                        <span class="price-value">₹6,380</span>
+                    </div>
+                    <div class="trend"><span class="up">↑ +1.9% </span>from yesterday</div>
+                </div>
+            </div>
+
+            <!-- Price Trends Chart -->
+            <div class="card">
+                <div class="card-title">📈 30-Day Wheat Price Trend</div>
+                <div style="display: flex; gap: 5px; justify-content: space-between; margin: 15px 0;">
+                    <div style="flex: 1;">
+                        <div class="chart">
+                            <div class="bar" style="height: 40%;"></div>
+                            <div class="bar" style="height: 50%;"></div>
+                            <div class="bar" style="height: 55%;"></div>
+                            <div class="bar" style="height: 65%;"></div>
+                            <div class="bar" style="height: 70%;"></div>
+                            <div class="bar" style="height: 75%;"></div>
+                            <div class="bar" style="height: 85%;"></div>
+                            <div class="bar" style="height: 90%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 12px;">
+                    <div>
+                        <div style="color: #666;">Highest</div>
+                        <div style="font-weight: 600; color: #333;">₹2,580</div>
+                    </div>
+                    <div>
+                        <div style="color: #666;">Lowest</div>
+                        <div style="font-weight: 600; color: #333;">₹2,250</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regional Prices -->
+            <div class="card">
+                <div class="card-title">🗺️ Regional Variations (Wheat)</div>
+                <div class="price-card">
+                    <div style="font-weight: 600; margin-bottom: 5px;">Punjab (Highest)</div>
+                    <div style="font-size: 13px; color: #333;">₹2,500/quintal <span style="color: #51cf66;">+2.0%</span></div>
+                </div>
+                <div class="price-card">
+                    <div style="font-weight: 600; margin-bottom: 5px;">Haryana</div>
+                    <div style="font-size: 13px; color: #333;">₹2,450/quintal <span style="color: #667eea;">Market Avg</span></div>
+                </div>
+                <div class="price-card">
+                    <div style="font-weight: 600; margin-bottom: 5px;">Madhya Pradesh</div>
+                    <div style="font-size: 13px; color: #333;">₹2,380/quintal <span style="color: #ff6b6b;">-2.9%</span></div>
+                </div>
+                <div class="price-card">
+                    <div style="font-weight: 600; margin-bottom: 5px;">Uttar Pradesh (Lowest)</div>
+                    <div style="font-size: 13px; color: #333;">₹2,350/quintal <span style="color: #ff6b6b;">-4.1%</span></div>
+                </div>
+            </div>
+
+            <!-- Market News -->
+            <div class="card">
+                <div class="card-title">📰 Market News</div>
+                <div class="news-item">
+                    <div class="news-date">Today, 2:30 PM</div>
+                    <div class="news-title">Wheat Prices Surge on Global Demand</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-date">Yesterday, 10:15 AM</div>
+                    <div class="news-title">Rice Market Stabilizes After Rally</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-date">2 days ago</div>
+                    <div class="news-title">Maize Production Forecast Updated</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-date">3 days ago</div>
+                    <div class="news-title">Cotton Export Restrictions Eased</div>
+                </div>
+            </div>
+
+            <!-- Price Alerts -->
+            <div class="card">
+                <div class="card-title">🔔 Price Alerts</div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="padding: 10px; background: #fff5f5; border-left: 4px solid #ff6b6b; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #333; font-size: 13px;">Wheat Price Alert</div>
+                        <p style="font-size: 12px; color: #666; margin: 3px 0;">Price reached ₹2,450 (Your target: ₹2,400)</p>
+                    </div>
+                    <div style="padding: 10px; background: #f0f4ff; border-left: 4px solid #667eea; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #333; font-size: 13px;">Rice Price Alert</div>
+                        <p style="font-size: 12px; color: #666; margin: 3px 0;">Price up 1.6% this week</p>
+                    </div>
+                </div>
+                <button>⚙️ Manage Alerts</button>
+            </div>
+
+            <!-- Insights -->
+            <div class="card">
+                <div class="card-title">💡 Market Insights</div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="padding: 10px; background: #f0f4ff; border-radius: 6px;">
+                        <strong style="color: #333; font-size: 13px;">Best Time to Sell</strong>
+                        <p style="font-size: 12px; color: #666; margin: 5px 0;">Wheat prices expected to peak next month</p>
+                    </div>
+                    <div style="padding: 10px; background: #f0f4ff; border-radius: 6px;">
+                        <strong style="color: #333; font-size: 13px;">Market Trend</strong>
+                        <p style="font-size: 12px; color: #666; margin: 5px 0;">Bullish trend for major crops this quarter</p>
+                    </div>
+                    <div style="padding: 10px; background: #f0f4ff; border-radius: 6px;">
+                        <strong style="color: #333; font-size: 13px;">Supply Status</strong>
+                        <p style="font-size: 12px; color: #666; margin: 5px 0;">Global inventory levels declining steadily</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Storage Management - CropGuard AI</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .storage-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+        .storage-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .storage-stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        .stat-label {
+            font-weight: 500;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .storage-usage {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .usage-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .usage-bar {
+            width: 100%;
+            height: 25px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .usage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #FFC107 50%, #F44336 100%);
+            width: 45%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .upload-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+        }
+        .upload-area:hover {
+            background: #f0f1ff;
+            border-color: #764ba2;
+        }
+        .upload-area.dragover {
+            background: #e8eaff;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        .upload-text {
+            font-size: 16px;
+            color: #333;
+            margin: 10px 0;
+        }
+        .upload-subtext {
+            font-size: 13px;
+            color: #999;
+        }
+        .upload-progress {
+            margin-top: 20px;
+            display: none;
+        }
+        .upload-progress.active {
+            display: block;
+        }
+        .progress-item {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .progress-filename {
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #66BB6A 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+        }
+        .progress-status {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+        .storage-provider {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .provider-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .provider-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        .provider-card.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        .provider-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .provider-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .provider-status {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .file-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .file-preview {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+        }
+        .file-preview.image {
+            background-size: cover;
+            background-position: center;
+        }
+        .file-info {
+            padding: 15px;
+        }
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .file-size {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+        .file-date {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 12px;
+        }
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .file-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .file-btn-download {
+            background: #4CAF50;
+            color: white;
+        }
+        .file-btn-download:hover {
+            background: #45a049;
+        }
+        .file-btn-delete {
+            background: #f44336;
+            color: white;
+        }
+        .file-btn-delete:hover {
+            background: #da190b;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #999;
+        }
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #999;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab-btn:hover {
+            color: #667eea;
+        }
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .storage-header {
+                grid-template-columns: 1fr;
+            }
+            .files-grid {
+                grid-template-columns: 1fr;
+            }
+            .storage-provider {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-section">
+                <h1>☁️ Cloud Storage</h1>
+                <p>Manage files and backups</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="storage-container">
+        <!-- Storage Dashboard -->
+        <div class="storage-header">
+            <div class="storage-stats">
+                <h3 style="margin-top: 0;">📊 Storage Statistics</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Total Files</span>
+                    <span class="stat-value" id="totalFiles">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Size</span>
+                    <span class="stat-value" id="totalSize">0 MB</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Active Uploads</span>
+                    <span class="stat-value" id="activeUploads">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Completed</span>
+                    <span class="stat-value" id="completedUploads">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Average Size</span>
+                    <span class="stat-value" id="avgSize">0 KB</span>
+                </div>
+            </div>
+
+            <div class="storage-usage">
+                <h3 style="margin-top: 0;">Storage Usage</h3>
+                <div class="usage-bar-label">
+                    <span>Quota Usage</span>
+                    <span id="usagePercent">45%</span>
+                </div>
+                <div class="usage-bar">
+                    <div class="usage-fill" id="usageFill"></div>
+                </div>
+                <div style="margin-top: 15px; font-size: 13px; color: #666;">
+                    <div>Used: <span id="usedSpace">2.3</span> GB of 5 GB</div>
+                    <div>Remaining: <span id="remainingSpace">2.7</span> GB</div>
+                </div>
+                <button class="btn btn-secondary" style="margin-top: 15px; width: 100%;">Request More Storage</button>
+            </div>
+        </div>
+
+        <!-- Storage Provider Selection -->
+        <h3>🔧 Storage Provider</h3>
+        <div class="storage-provider">
+            <div class="provider-card active" onclick="switchProvider('aws')">
+                <div class="provider-icon">☁️</div>
+                <div class="provider-name">Amazon S3</div>
+                <div class="provider-status">Connected</div>
+            </div>
+            <div class="provider-card" onclick="switchProvider('azure')">
+                <div class="provider-icon">☁️</div>
+                <div class="provider-name">Azure Blob</div>
+                <div class="provider-status">Ready to connect</div>
+            </div>
+            <div class="provider-card" onclick="switchProvider('gcs')">
+                <div class="provider-icon">☁️</div>
+                <div class="provider-name">Google Cloud</div>
+                <div class="provider-status">Ready to connect</div>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <h3>📤 Upload Files</h3>
+            
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Click or drag files here</div>
+                <div class="upload-subtext">Supports all file types | Max 50MB per file</div>
+                <input type="file" id="fileInput" multiple hidden>
+            </div>
+
+            <div class="upload-progress" id="uploadProgress">
+                <h4>Upload Progress</h4>
+                <div id="progressItems"></div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('all-files')">All Files</button>
+            <button class="tab-btn" onclick="switchTab('images')">Images</button>
+            <button class="tab-btn" onclick="switchTab('documents')">Documents</button>
+            <button class="tab-btn" onclick="switchTab('recent')">Recent</button>
+        </div>
+
+        <!-- Files Grid -->
+        <div id="all-files" class="tab-content active">
+            <div class="files-grid" id="filesGrid">
+                <!-- Files will be loaded here -->
+            </div>
+        </div>
+
+        <div id="images" class="tab-content">
+            <div class="files-grid" id="imagesGrid">
+                <!-- Image files will be loaded here -->
+            </div>
+        </div>
+
+        <div id="documents" class="tab-content">
+            <div class="files-grid" id="documentsGrid">
+                <!-- Document files will be loaded here -->
+            </div>
+        </div>
+
+        <div id="recent" class="tab-content">
+            <div class="files-grid" id="recentGrid">
+                <!-- Recent files will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <script src="storage-manager.js"></script>
+    <script>
+        // Initialize storage interface
+        let currentProvider = 'aws';
+        let currentTab = 'all-files';
+
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStorageData();
+            setupUploadArea();
+            setupStorageListeners();
+        });
+
+        // Setup upload area drag and drop
+        function setupUploadArea() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+
+        // Handle file uploads
+        async function handleFiles(files) {
+            const progressDiv = document.getElementById('uploadProgress');
+            progressDiv.classList.add('active');
+
+            for (let file of files) {
+                try {
+                    const result = await storageManager.uploadFile(file, 'uploads', {
+                        uploadedBy: 'farmer-portal',
+                        device: navigator.userAgent
+                    });
+                    
+                    console.log('Upload successful:', result);
+                    loadStorageData();
+
+                } catch (error) {
+                    alert(`Failed to upload ${file.name}: ${error.message}`);
+                }
+            }
+        }
+
+        // Setup storage event listeners
+        function setupStorageListeners() {
+            storageManager.onUploadEvent((event) => {
+                updateUploadProgress(event);
+                if (event.type === 'upload-completed') {
+                    loadStorageData();
+                }
+            });
+        }
+
+        // Update upload progress display
+        function updateUploadProgress(event) {
+            const progressDiv = document.getElementById('uploadProgress');
+            const itemsDiv = document.getElementById('progressItems');
+
+            if (event.type === 'upload-progress') {
+                const data = event.data;
+                let item = document.getElementById(`upload-${data.id}`);
+                
+                if (!item) {
+                    item = document.createElement('div');
+                    item.id = `upload-${data.id}`;
+                    item.className = 'progress-item';
+                    itemsDiv.appendChild(item);
+                }
+
+                item.innerHTML = `
+                    <div class="progress-filename">
+                        <span>${data.fileName}</span>
+                        <span>${data.progress.toFixed(0)}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${data.progress}%"></div>
+                    </div>
+                    <div class="progress-status">
+                        <span>${(data.fileSize / 1024 / 1024).toFixed(2)} MB</span>
+                        <span>${data.status}</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Load storage data
+        function loadStorageData() {
+            const stats = storageManager.getStatistics();
+            
+            document.getElementById('totalFiles').textContent = stats.totalFiles;
+            document.getElementById('totalSize').textContent = stats.totalSizeMB + ' MB';
+            document.getElementById('activeUploads').textContent = stats.activeUploads;
+            document.getElementById('completedUploads').textContent = stats.completedUploads;
+            document.getElementById('avgSize').textContent = stats.averageFileSize;
+
+            // Sample files for display
+            loadSampleFiles();
+        }
+
+        // Load sample files
+        function loadSampleFiles() {
+            const files = [
+                { name: 'crop-disease.jpg', size: '2.3 MB', date: '2 days ago', type: 'image' },
+                { name: 'farm-data.csv', size: '450 KB', date: '1 week ago', type: 'document' },
+                { name: 'irrigation-schedule.pdf', size: '1.2 MB', date: '3 days ago', type: 'document' },
+                { name: 'pest-analysis.jpg', size: '3.1 MB', date: 'Today', type: 'image' },
+                { name: 'soil-test.pdf', size: '890 KB', date: '5 days ago', type: 'document' },
+                { name: 'weather-data.csv', size: '320 KB', date: 'Today', type: 'document' }
+            ];
+
+            displayFiles(files, 'all');
+            displayFiles(files.filter(f => f.type === 'image'), 'images');
+            displayFiles(files.filter(f => f.type === 'document'), 'documents');
+            displayFiles(files.slice(0, 3), 'recent');
+        }
+
+        // Display files in grid
+        function displayFiles(files, tab) {
+            const gridId = tab === 'all' ? 'filesGrid' : (tab === 'recent' ? 'recentGrid' : tab + 'Grid');
+            const grid = document.getElementById(gridId);
+
+            if (files.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>No files found</div>';
+                return;
+            }
+
+            grid.innerHTML = files.map(file => `
+                <div class="file-card">
+                    <div class="file-preview ${file.type}">
+                        ${file.type === 'image' ? '🖼️' : '📄'}
+                    </div>
+                    <div class="file-info">
+                        <div class="file-name" title="${file.name}">${file.name}</div>
+                        <div class="file-size">${file.size}</div>
+                        <div class="file-date">${file.date}</div>
+                        <div class="file-actions">
+                            <button class="file-btn file-btn-download" onclick="downloadFile('${file.name}')">Download</button>
+                            <button class="file-btn file-btn-delete" onclick="deleteFile('${file.name}')">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Switch tab
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+
+            currentTab = tab;
+        }
+
+        // Switch storage provider
+        function switchProvider(provider) {
+            currentProvider = provider;
+            storageManager.config.provider = provider;
+            localStorage.setItem('storage-provider', provider);
+
+            document.querySelectorAll('.provider-card').forEach(el => el.classList.remove('active'));
+            event.target.closest('.provider-card').classList.add('active');
+        }
+
+        // Download file
+        function downloadFile(filename) {
+            alert(`Downloading: ${filename}`);
+            // Simulate download
+            const link = document.createElement('a');
+            link.href = '#';
+            link.download = filename;
+            link.click();
+        }
+
+        // Delete file
+        function deleteFile(filename) {
+            if (confirm(`Delete "${filename}"?`)) {
+                alert(`Deleted: ${filename}`);
+                loadStorageData();
+            }
+        }
+    </script>
+</body>
+</html>

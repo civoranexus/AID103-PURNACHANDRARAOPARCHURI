@@ -1,0 +1,893 @@
+<!-- CropGuard AI - Photo Capture Module -->
+<!-- Add this to index.html in the appropriate section -->
+
+<section id="photo-capture-section" class="photo-capture-module" style="display:none;">
+    <div class="photo-container">
+        <!-- Camera/Photo Tabs -->
+        <div class="photo-tabs">
+            <button class="tab-btn active" data-tab="camera">📷 Camera</button>
+            <button class="tab-btn" data-tab="upload">📤 Upload File</button>
+            <button class="tab-btn" data-tab="url">🔗 Image URL</button>
+        </div>
+
+        <!-- Camera Tab -->
+        <div id="camera-tab" class="tab-content active">
+            <div class="camera-container">
+                <video id="cameraPreview" autoplay playsinline style="max-width: 100%; border-radius: 8px;"></video>
+                <div class="camera-controls">
+                    <button id="startCameraBtn" class="btn btn-primary">🎬 Start Camera</button>
+                    <button id="capturePhotoBtn" class="btn btn-success" disabled>📸 Capture Photo</button>
+                    <button id="stopCameraBtn" class="btn btn-secondary" disabled>⏹️ Stop Camera</button>
+                </div>
+                <p class="info-text">Position the leaf/plant disease in the center and tap Capture</p>
+            </div>
+        </div>
+
+        <!-- Upload Tab -->
+        <div id="upload-tab" class="tab-content" style="display:none;">
+            <div class="upload-container">
+                <div class="drop-zone" id="dropZone">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <h3>Drag and drop your image here</h3>
+                    <p>or click to select a file</p>
+                    <input type="file" id="fileInput" accept="image/*" style="display:none;" />
+                </div>
+                <div class="file-info" id="fileInfo" style="display:none;">
+                    <p><strong>Selected:</strong> <span id="fileName">-</span></p>
+                    <p><strong>Size:</strong> <span id="fileSize">-</span></p>
+                    <button id="clearFileBtn" class="btn btn-secondary" style="margin-top: 10px;">Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- URL Tab -->
+        <div id="url-tab" class="tab-content" style="display:none;">
+            <div class="url-container">
+                <label>Enter Image URL:</label>
+                <input type="url" id="imageUrlInput" placeholder="https://example.com/disease.jpg" class="input-field">
+                <button id="loadUrlBtn" class="btn btn-primary">Load Image</button>
+                <p class="info-text">Make sure the URL is publicly accessible</p>
+            </div>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="preview-section" id="previewSection" style="display:none;">
+            <h3>Image Preview</h3>
+            <div class="preview-container">
+                <canvas id="photoCanvas"></canvas>
+                <img id="previewImage" style="max-width: 100%; border-radius: 8px;">
+            </div>
+            <div class="preview-info">
+                <p><strong>Size:</strong> <span id="imageDimensions">-</span></p>
+                <p><strong>File Size:</strong> <span id="imageSizeKB">-</span></p>
+            </div>
+            <div class="preview-actions">
+                <button id="rotateImageBtn" class="btn btn-secondary">🔄 Rotate</button>
+                <button id="cropImageBtn" class="btn btn-secondary">✂️ Crop</button>
+                <button id="resetImageBtn" class="btn btn-secondary">↩️ Reset</button>
+            </div>
+        </div>
+
+        <!-- Image Quality Options -->
+        <div class="quality-settings" id="qualitySettings" style="display:none;">
+            <h3>Image Quality</h3>
+            <div class="quality-slider">
+                <label>Compression Quality:</label>
+                <input type="range" id="qualitySlider" min="0.3" max="1" step="0.1" value="0.8">
+                <span id="qualityValue">80%</span>
+            </div>
+            <div class="quality-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="autoCompressCheckbox" checked>
+                    <span>Auto-compress for faster upload</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="autoRotateCheckbox" checked>
+                    <span>Auto-rotate based on EXIF</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons" id="actionButtons" style="display:none;">
+            <button id="usePhotoBtn" class="btn btn-success btn-large">
+                ✅ Use This Photo for Analysis
+            </button>
+            <button id="cancelPhotoBtn" class="btn btn-secondary btn-large">
+                ❌ Cancel & Retake
+            </button>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-indicator" id="uploadProgress" style="display:none;">
+            <h4>Uploading...</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p id="progressText">0%</p>
+        </div>
+    </div>
+</section>
+
+<!-- Embedded CSS for Photo Capture Module -->
+<style>
+.photo-capture-module {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.photo-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.tab-btn {
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: #888;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    color: #1B9AAA;
+    border-bottom-color: #1B9AAA;
+}
+
+.tab-btn:hover {
+    color: #1B9AAA;
+}
+
+.tab-content {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Camera Section */
+.camera-container {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+#cameraPreview {
+    width: 100%;
+    max-height: 500px;
+    background: #000;
+    margin-bottom: 15px;
+    display: none;
+}
+
+.camera-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.info-text {
+    font-size: 14px;
+    color: #888;
+    margin-top: 10px;
+}
+
+/* Upload Section */
+.drop-zone {
+    border: 3px dashed #1B9AAA;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f0fffe;
+}
+
+.drop-zone:hover {
+    background: #e8fdfc;
+    border-color: #16808D;
+}
+
+.drop-zone.dragover {
+    background: #d4faff;
+    border-color: #0d6b77;
+    transform: scale(1.02);
+}
+
+.drop-zone svg {
+    color: #1B9AAA;
+    margin-bottom: 10px;
+}
+
+.drop-zone h3 {
+    margin: 10px 0 5px;
+    color: #1B9AAA;
+    font-size: 18px;
+}
+
+.drop-zone p {
+    color: #888;
+    font-size: 14px;
+}
+
+.file-info {
+    background: #f0fffe;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    border-left: 3px solid #1B9AAA;
+}
+
+.file-info p {
+    margin: 5px 0;
+    color: #555;
+}
+
+/* URL Section */
+.url-container {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.url-container label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #555;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #1B9AAA;
+}
+
+/* Preview Section */
+.preview-section {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.preview-section h3 {
+    margin-top: 0;
+    color: #1B9AAA;
+}
+
+.preview-container {
+    margin: 15px 0;
+    max-height: 400px;
+    overflow: auto;
+    border-radius: 8px;
+}
+
+#photoCanvas {
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+#previewImage {
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+.preview-info {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 12px 0;
+    border-left: 3px solid #1B9AAA;
+}
+
+.preview-info p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-secondary {
+    background: #ddd;
+    color: #555;
+}
+
+.btn-secondary:hover {
+    background: #ccc;
+}
+
+/* Quality Settings */
+.quality-settings {
+    background: white;
+    border: 2px solid #f0f0f0;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.quality-settings h3 {
+    margin-top: 0;
+    font-size: 16px;
+    color: #1B9AAA;
+}
+
+.quality-slider {
+    margin-bottom: 15px;
+}
+
+.quality-slider label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.quality-slider input[type="range"] {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+#qualityValue {
+    font-weight: bold;
+    color: #1B9AAA;
+    float: right;
+}
+
+.quality-options {
+    margin-top: 15px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.checkbox-label input {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-direction: column;
+}
+
+.btn-large {
+    padding: 14px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-success {
+    background: #10B981;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+/* Progress Bar */
+.progress-indicator {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.progress-indicator h4 {
+    margin-top: 0;
+    color: #1B9AAA;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #1B9AAA, #10B981);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+#progressText {
+    font-weight: bold;
+    color: #1B9AAA;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .photo-tabs {
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        flex: 1;
+        min-width: 100px;
+    }
+
+    .camera-controls {
+        flex-direction: column;
+    }
+
+    .camera-controls button {
+        width: 100%;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons button {
+        width: 100%;
+    }
+
+    .preview-actions {
+        flex-direction: column;
+    }
+
+    .preview-actions button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .photo-capture-module {
+        padding: 15px;
+    }
+
+    .drop-zone {
+        padding: 30px 15px;
+    }
+
+    .tab-btn {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+}
+
+/* Loading State */
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Error State */
+.error-message {
+    background: #FEE2E2;
+    border-left: 3px solid #EF4444;
+    color: #DC2626;
+    padding: 12px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+/* Success State */
+.success-message {
+    background: #DCFCE7;
+    border-left: 3px solid #10B981;
+    color: #15803D;
+    padding: 12px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+</style>
+
+<!-- JavaScript for Photo Capture Module -->
+<script>
+/**
+ * Photo Capture Module - Complete camera & upload functionality
+ * Supports: Camera capture, file upload, image URL, compression
+ */
+
+class PhotoCaptureModule {
+    constructor() {
+        this.videoStream = null;
+        this.canvas = null;
+        this.imageData = null;
+        this.imageFile = null;
+        this.rotationAngle = 0;
+        this.setupElements();
+        this.setupEventListeners();
+    }
+
+    setupElements() {
+        this.elements = {
+            section: document.getElementById('photo-capture-section'),
+            tabs: document.querySelectorAll('.tab-btn'),
+            tabContents: document.querySelectorAll('.tab-content'),
+
+            // Camera
+            cameraPreview: document.getElementById('cameraPreview'),
+            startCameraBtn: document.getElementById('startCameraBtn'),
+            capturePhotoBtn: document.getElementById('capturePhotoBtn'),
+            stopCameraBtn: document.getElementById('stopCameraBtn'),
+
+            // Upload
+            dropZone: document.getElementById('dropZone'),
+            fileInput: document.getElementById('fileInput'),
+            fileInfo: document.getElementById('fileInfo'),
+            fileName: document.getElementById('fileName'),
+            fileSize: document.getElementById('fileSize'),
+            clearFileBtn: document.getElementById('clearFileBtn'),
+
+            // URL
+            imageUrlInput: document.getElementById('imageUrlInput'),
+            loadUrlBtn: document.getElementById('loadUrlBtn'),
+
+            // Preview
+            previewSection: document.getElementById('previewSection'),
+            photoCanvas: document.getElementById('photoCanvas'),
+            previewImage: document.getElementById('previewImage'),
+            imageDimensions: document.getElementById('imageDimensions'),
+            imageSizeKB: document.getElementById('imageSizeKB'),
+            rotateImageBtn: document.getElementById('rotateImageBtn'),
+            cropImageBtn: document.getElementById('cropImageBtn'),
+            resetImageBtn: document.getElementById('resetImageBtn'),
+
+            // Quality
+            qualitySettings: document.getElementById('qualitySettings'),
+            qualitySlider: document.getElementById('qualitySlider'),
+            qualityValue: document.getElementById('qualityValue'),
+            autoCompressCheckbox: document.getElementById('autoCompressCheckbox'),
+
+            // Actions
+            actionButtons: document.getElementById('actionButtons'),
+            usePhotoBtn: document.getElementById('usePhotoBtn'),
+            cancelPhotoBtn: document.getElementById('cancelPhotoBtn'),
+
+            // Progress
+            uploadProgress: document.getElementById('uploadProgress'),
+            progressFill: document.getElementById('progressFill'),
+            progressText: document.getElementById('progressText')
+        };
+    }
+
+    setupEventListeners() {
+        // Tab switching
+        this.elements.tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
+        });
+
+        // Camera controls
+        this.elements.startCameraBtn.addEventListener('click', () => this.startCamera());
+        this.elements.capturePhotoBtn.addEventListener('click', () => this.capturePhoto());
+        this.elements.stopCameraBtn.addEventListener('click', () => this.stopCamera());
+
+        // File upload
+        this.elements.dropZone.addEventListener('click', () => this.elements.fileInput.click());
+        this.elements.dropZone.addEventListener('dragover', (e) => this.handleDragOver(e));
+        this.elements.dropZone.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+        this.elements.dropZone.addEventListener('drop', (e) => this.handleDrop(e));
+        this.elements.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+        this.elements.clearFileBtn.addEventListener('click', () => this.clearFile());
+
+        // URL loading
+        this.elements.loadUrlBtn.addEventListener('click', () => this.loadImageFromUrl());
+
+        // Image manipulation
+        this.elements.rotateImageBtn.addEventListener('click', () => this.rotateImage());
+        this.elements.resetImageBtn.addEventListener('click', () => this.resetImage());
+
+        // Quality slider
+        this.elements.qualitySlider.addEventListener('input', (e) => {
+            this.elements.qualityValue.textContent = Math.round(e.target.value * 100) + '%';
+        });
+
+        // Action buttons
+        this.elements.usePhotoBtn.addEventListener('click', () => this.usePhoto());
+        this.elements.cancelPhotoBtn.addEventListener('click', () => this.cancelPhoto());
+    }
+
+    // ==================== TAB MANAGEMENT ====================
+
+    switchTab(tabName) {
+        // Hide all tabs
+        this.elements.tabContents.forEach(tab => {
+            tab.style.display = 'none';
+        });
+
+        // Remove active class from buttons
+        this.elements.tabs.forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Show selected tab
+        const selectedTab = document.getElementById(`${tabName}-tab`);
+        if (selectedTab) {
+            selectedTab.style.display = 'block';
+        }
+
+        // Add active class to clicked button
+        event.target.classList.add('active');
+    }
+
+    // ==================== CAMERA FUNCTIONS ====================
+
+    async startCamera() {
+        try {
+            this.videoStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'environment',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            });
+
+            this.elements.cameraPreview.srcObject = this.videoStream;
+            this.elements.cameraPreview.style.display = 'block';
+
+            // Enable/disable buttons
+            this.elements.startCameraBtn.disabled = true;
+            this.elements.capturePhotoBtn.disabled = false;
+            this.elements.stopCameraBtn.disabled = false;
+
+            showAlert('📷 Camera started. Position your subject and tap Capture.', 'info');
+        } catch (error) {
+            showAlert(`Camera error: ${error.message}`, 'error');
+        }
+    }
+
+    capturePhoto() {
+        if (!this.videoStream) return;
+
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = this.elements.cameraPreview.videoWidth;
+        this.canvas.height = this.elements.cameraPreview.videoHeight;
+
+        const ctx = this.canvas.getContext('2d');
+        ctx.drawImage(this.elements.cameraPreview, 0, 0);
+
+        this.canvas.toBlob((blob) => {
+            this.imageFile = blob;
+            this.displayPreview(this.canvas);
+            this.stopCamera();
+            showAlert('✅ Photo captured successfully!', 'success');
+        }, 'image/jpeg', parseFloat(this.elements.qualitySlider.value));
+    }
+
+    stopCamera() {
+        if (this.videoStream) {
+            this.videoStream.getTracks().forEach(track => track.stop());
+            this.videoStream = null;
+        }
+
+        this.elements.cameraPreview.style.display = 'none';
+        this.elements.startCameraBtn.disabled = false;
+        this.elements.capturePhotoBtn.disabled = true;
+        this.elements.stopCameraBtn.disabled = true;
+    }
+
+    // ==================== FILE UPLOAD ====================
+
+    handleDragOver(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.elements.dropZone.classList.add('dragover');
+    }
+
+    handleDragLeave(e) {
+        e.preventDefault();
+        this.elements.dropZone.classList.remove('dragover');
+    }
+
+    handleDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.elements.dropZone.classList.remove('dragover');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            this.handleFileSelect({ target: { files } });
+        }
+    }
+
+    handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (!file || !file.type.startsWith('image/')) {
+            showAlert('Please select an image file', 'error');
+            return;
+        }
+
+        this.imageFile = file;
+
+        // Display file info
+        this.elements.fileName.textContent = file.name;
+        this.elements.fileSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
+        this.elements.fileInfo.style.display = 'block';
+
+        // Preview image
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                this.displayPreview(img);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+
+        showAlert('✅ Image loaded successfully', 'success');
+    }
+
+    clearFile() {
+        this.imageFile = null;
+        this.elements.fileInput.value = '';
+        this.elements.fileInfo.style.display = 'none';
+        this.elements.previewSection.style.display = 'none';
+        this.elements.actionButtons.style.display = 'none';
+    }
+
+    // ==================== URL LOADING ====================
+
+    async loadImageFromUrl() {
+        const url = this.elements.imageUrlInput.value;
+        if (!url) {
+            showAlert('Please enter an image URL', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+
+            if (!blob.type.startsWith('image/')) {
+                showAlert('URL does not point to an image', 'error');
+                return;
+            }
+
+            this.imageFile = blob;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => this.displayPreview(img);
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(blob);
+
+            showAlert('✅ Image loaded from URL', 'success');
+        } catch (error) {
+            showAlert(`Failed to load image: ${error.message}`, 'error');
+        }
+    }
+
+    // ==================== IMAGE PREVIEW ====================
+
+    displayPreview(source) {
+        const img = new Image();
+        img.onload = () => {
+            // Display image
+            this.elements.previewImage.src = img.src;
+            this.elements.previewImage.style.display = 'block';
+
+            // Update dimensions
+            this.elements.imageDimensions.textContent = `${img.width} x ${img.height}px`;
+
+            if (this.imageFile) {
+                this.elements.imageSizeKB.textContent = (this.imageFile.size / 1024).toFixed(2) + ' KB';
+            }
+
+            // Show sections
+            this.elements.previewSection.style.display = 'block';
+            this.elements.qualitySettings.style.display = 'block';
+            this.elements.actionButtons.style.display = 'block';
+        };
+
+        if (source instanceof HTMLCanvasElement) {
+            img.src = source.toDataURL('image/jpeg', 0.95);
+        } else {
+            img.src = source.src;
+        }
+    }
+
+    rotateImage() {
+        this.rotationAngle = (this.rotationAngle + 90) % 360;
+        this.elements.previewImage.style.transform = `rotate(${this.rotationAngle}deg)`;
+        showAlert(`Rotated ${this.rotationAngle}°`, 'info');
+    }
+
+    resetImage() {
+        this.rotationAngle = 0;
+        this.elements.previewImage.style.transform = 'rotate(0deg)';
+    }
+
+    // ==================== PHOTO USAGE ====================
+
+    usePhoto() {
+        if (!this.imageFile) {
+            showAlert('No image selected', 'error');
+            return;
+        }
+
+        // Store in global state
+        state.image.file = this.imageFile;
+        state.image.source = 'captured';
+        state.image.data = this.elements.previewImage.src;
+
+        showAlert('📸 Photo ready for analysis!', 'success');
+        this.hide();
+
+        // Trigger analysis if function exists
+        if (typeof submitDetection === 'function') {
+            setTimeout(() => {
+                submitDetection();
+            }, 500);
+        }
+    }
+
+    cancelPhoto() {
+        this.clearFile();
+        this.resetImage();
+        this.stopCamera();
+        this.hide();
+        showAlert('Photo capture cancelled', 'info');
+    }
+
+    // ==================== MODULE CONTROL ====================
+
+    show() {
+        this.elements.section.style.display = 'block';
+    }
+
+    hide() {
+        this.elements.section.style.display = 'none';
+    }
+}
+
+// Initialize photo capture module
+const photoCaptureModule = new PhotoCaptureModule();
+</script>
